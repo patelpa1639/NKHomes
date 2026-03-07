@@ -62,7 +62,7 @@ export default function PinGate({ children }: { children: React.ReactNode }) {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
         <div className="w-6 h-6 border-2 border-gold/30 border-t-gold animate-spin" />
       </div>
     );
@@ -71,7 +71,7 @@ export default function PinGate({ children }: { children: React.ReactNode }) {
   if (authenticated) return <>{children}</>;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-bg-primary px-6">
       {/* Logo */}
       <div className="flex items-center gap-4 mb-16">
         <div className="relative w-12 h-12 border border-gold/50 flex items-center justify-center">
