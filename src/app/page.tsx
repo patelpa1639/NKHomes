@@ -8,7 +8,7 @@ import UploadZone from '@/components/UploadZone';
 import FilterBar from '@/components/FilterBar';
 import LeadTable from '@/components/LeadTable';
 import SubmissionsPanel from '@/components/SubmissionsPanel';
-import { Lead, Filters, SortField, SortDirection, OutreachStatus } from '@/lib/types';
+import { Lead, RawLead, Filters, SortField, SortDirection, OutreachStatus } from '@/lib/types';
 import { processLead } from '@/lib/scoring';
 import { parseCSV } from '@/lib/csvParser';
 import { sampleLeads } from '@/lib/sampleData';
@@ -34,17 +34,35 @@ export default function Dashboard() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [outreachCache, setOutreachCache] = useState<Record<string, OutreachStatus>>({});
 
-  // Load sample data on mount
+  // Load saved leads from API, fall back to sample data
   useEffect(() => {
-    const processed = sampleLeads.map(processLead);
-    setLeads(processed);
-
-    // Load outreach data for all leads
-    const cache: Record<string, OutreachStatus> = {};
-    processed.forEach((lead) => {
-      cache[lead.address] = getOutreach(lead.address);
-    });
-    setOutreachCache(cache);
+    async function loadLeads() {
+      try {
+        const res = await fetch('/api/leads');
+        const saved = await res.json();
+        if (saved && Array.isArray(saved) && saved.length > 0) {
+          const processed = (saved as RawLead[]).map(processLead);
+          setLeads(processed);
+          const cache: Record<string, OutreachStatus> = {};
+          processed.forEach((lead) => {
+            cache[lead.address] = getOutreach(lead.address);
+          });
+          setOutreachCache(cache);
+          return;
+        }
+      } catch {
+        // API not available, use sample data
+      }
+      // Fallback to sample data
+      const processed = sampleLeads.map(processLead);
+      setLeads(processed);
+      const cache: Record<string, OutreachStatus> = {};
+      processed.forEach((lead) => {
+        cache[lead.address] = getOutreach(lead.address);
+      });
+      setOutreachCache(cache);
+    }
+    loadLeads();
   }, []);
 
   const handleFileUpload = useCallback(async (file: File) => {
@@ -60,6 +78,13 @@ export default function Dashboard() {
         cache[lead.address] = getOutreach(lead.address);
       });
       setOutreachCache(cache);
+
+      // Save raw leads to API so they persist across refreshes
+      fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rawLeads),
+      }).catch((err) => console.error('Failed to save leads to server:', err));
     } catch (error) {
       console.error('Failed to parse CSV:', error);
       alert('Failed to parse CSV file. Please check the format and try again.');
@@ -127,6 +152,8 @@ export default function Dashboard() {
   const handleDeleteAllLeads = useCallback(() => {
     setLeads([]);
     setOutreachCache({});
+    // Clear saved leads from server so sample data loads on next visit
+    fetch('/api/leads', { method: 'DELETE' }).catch(() => {});
   }, []);
 
   const handleSort = useCallback(
