@@ -95,3 +95,27 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }
+
+// DELETE — remove a submission by id (called from dashboard)
+export async function DELETE(req: Request) {
+  try {
+    const redis = getRedis();
+    if (!redis) {
+      return NextResponse.json({ error: 'Storage not configured' }, { status: 503 });
+    }
+
+    const { id } = await req.json();
+    if (!id) {
+      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+    }
+
+    const existing = (await redis.get<HomeValueSubmission[]>(STORAGE_KEY)) || [];
+    const filtered = existing.filter((s) => s.id !== id);
+    await redis.set(STORAGE_KEY, filtered);
+
+    return NextResponse.json({ deleted: id });
+  } catch (error) {
+    console.error('Failed to delete submission:', error);
+    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
+  }
+}

@@ -58,6 +58,21 @@ export default function SubmissionsPanel() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    // Optimistic removal
+    setSubmissions((prev) => prev.filter((s) => s.id !== id));
+    setExpandedId(null);
+    try {
+      await fetch('/api/submissions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+    } catch {
+      refresh(); // Revert on error
+    }
+  };
+
   if (loading) {
     return (
       <div className="relative z-10 max-w-[1440px] mx-auto px-8 mb-6">
@@ -211,6 +226,21 @@ export default function SubmissionsPanel() {
                             placeholder="Add notes about this submission..."
                             className="w-full bg-bg-primary/50 border border-border-custom text-text-secondary text-[12px] font-body p-2.5 h-16 resize-none focus:border-gold/25 placeholder:text-text-muted/60"
                           />
+                        </div>
+
+                        {/* Delete */}
+                        <div className="flex items-end">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm('Delete this submission?')) {
+                                handleDelete(sub.id);
+                              }
+                            }}
+                            className="text-[10px] text-text-muted/40 font-body hover:text-alert transition-colors tracking-wider uppercase whitespace-nowrap"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </td>
