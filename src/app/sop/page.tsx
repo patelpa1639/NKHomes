@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import PinGate from '@/components/PinGate';
 
 const SOP_SECTIONS = [
   {
@@ -173,6 +174,7 @@ export default function SOPPage() {
   };
 
   return (
+    <PinGate>
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <div className="h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
@@ -290,7 +292,7 @@ export default function SOPPage() {
                   {section.touches.map((touch) => (
                     <div key={touch.code} className="bg-bg-card/40 border border-border-custom p-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-7 h-7 bg-gold text-bg-primary flex items-center justify-center text-[11px] font-bold flex-shrink-0">
+                        <div className="w-7 h-7 bg-gold text-white flex items-center justify-center text-[11px] font-bold flex-shrink-0">
                           {touch.code}
                         </div>
                         <div>
@@ -320,5 +322,6 @@ export default function SOPPage() {
         </div>
       </div>
     </div>
+    </PinGate>
   );
 }

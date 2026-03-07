@@ -2,25 +2,25 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #08090c;
-  --bg-elevated: #0f1117;
-  --bg-card: #141722;
-  --bg-card-hover: #1a1e2e;
-  --border: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.1);
-  --gold: #d4a853;
-  --gold-light: #f0d48a;
-  --gold-dim: rgba(212, 168, 83, 0.4);
-  --gold-glow: rgba(212, 168, 83, 0.12);
-  --text-primary: #eeeae4;
-  --text-secondary: #b0aда6;
-  --text-muted: #6b6860;
-  --success: #34d399;
-  --success-dim: rgba(52, 211, 153, 0.15);
-  --warning: #fbbf24;
-  --warning-dim: rgba(251, 191, 36, 0.15);
-  --alert: #f87171;
-  --alert-dim: rgba(248, 113, 113, 0.15);
+  --bg-primary: #ffffff;
+  --bg-elevated: #f9f8f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f4f1;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --gold: #b8913a;
+  --gold-light: #d4a853;
+  --gold-dim: rgba(184, 145, 58, 0.12);
+  --gold-glow: rgba(184, 145, 58, 0.06);
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #8a8a8a;
+  --success: #059669;
+  --success-dim: rgba(5, 150, 105, 0.08);
+  --warning: #d97706;
+  --warning-dim: rgba(217, 119, 6, 0.08);
+  --alert: #dc2626;
+  --alert-dim: rgba(220, 38, 38, 0.08);
 }
 
 @theme inline {
@@ -52,7 +52,7 @@
 }
 
 body {
-  background: linear-gradient(180deg, #08090c 0%, #0c0e14 50%, #08090c 100%);
+  background: #ffffff;
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   font-weight: 400;
@@ -61,7 +61,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle radial glow behind content */
+/* Subtle warm glow behind content */
 body::before {
   content: '';
   position: fixed;
@@ -70,7 +70,7 @@ body::before {
   transform: translateX(-50%);
   width: 800px;
   height: 600px;
-  background: radial-gradient(ellipse, rgba(212, 168, 83, 0.04) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(184, 145, 58, 0.04) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -83,15 +83,15 @@ body::before {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 168, 83, 0.3);
+  background: rgba(184, 145, 58, 0.4);
 }
 
 ::selection {
-  background: rgba(212, 168, 83, 0.3);
+  background: rgba(184, 145, 58, 0.2);
   color: var(--text-primary);
 }
 

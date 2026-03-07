@@ -14,6 +14,7 @@ import { parseCSV } from '@/lib/csvParser';
 import { sampleLeads } from '@/lib/sampleData';
 import { getOutreach, saveOutreach, getOutreachLevel } from '@/lib/persistence';
 import { exportLeadsToCSV } from '@/lib/exportCsv';
+import PinGate from '@/components/PinGate';
 
 const DEFAULT_FILTERS: Filters = {
   armType: '',
@@ -251,6 +252,7 @@ export default function Dashboard() {
   }, [filteredLeads, getOutreachCached]);
 
   return (
+    <PinGate>
     <div className="min-h-screen flex flex-col">
       <Header />
 
@@ -284,5 +286,6 @@ export default function Dashboard() {
 
       <Footer />
     </div>
+    </PinGate>
   );
 }

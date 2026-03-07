@@ -283,11 +283,11 @@ function HomeValueContent() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gold text-bg-primary text-[13px] font-body font-bold tracking-[0.1em] uppercase py-3.5 mt-4 hover:bg-gold-light transition-colors disabled:opacity-50"
+            className="w-full bg-gold text-white text-[13px] font-body font-bold tracking-[0.1em] uppercase py-3.5 mt-4 hover:bg-gold-light transition-colors disabled:opacity-50"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-bg-primary/30 border-t-bg-primary animate-spin" />
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin" />
                 Processing...
               </span>
             ) : isPropertySpecific ? (

@@ -44,7 +44,7 @@ export default function SubmissionsPanel() {
               Home Value Submissions
             </p>
             {newCount > 0 && (
-              <span className="bg-gold text-bg-primary text-[10px] font-body font-bold px-2 py-0.5">
+              <span className="bg-gold text-white text-[10px] font-body font-bold px-2 py-0.5">
                 {newCount} new
               </span>
             )}
@@ -72,7 +72,7 @@ export default function SubmissionsPanel() {
                 <tr
                   key={sub.id}
                   onClick={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
-                  className="border-b border-border-custom cursor-pointer hover:bg-white/[0.02] transition-colors text-[12px] font-body"
+                  className="border-b border-border-custom cursor-pointer hover:bg-black/[0.02] transition-colors text-[12px] font-body"
                 >
                   <td className="px-5 py-2.5">
                     <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase

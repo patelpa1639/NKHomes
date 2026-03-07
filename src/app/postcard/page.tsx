@@ -5,6 +5,7 @@ import { Lead } from '@/lib/types';
 import { processLead } from '@/lib/scoring';
 import { sampleLeads } from '@/lib/sampleData';
 import QRCode from 'qrcode';
+import PinGate from '@/components/PinGate';
 
 interface PostcardData {
   recipientName: string;
@@ -128,6 +129,7 @@ export default function PostcardPage() {
   };
 
   return (
+    <PinGate>
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <div className="h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
@@ -245,7 +247,7 @@ export default function PostcardPage() {
             {/* Actions */}
             <button
               onClick={handlePrint}
-              className="w-full bg-gold text-bg-primary text-[11px] font-body font-bold tracking-[0.1em] uppercase py-3 hover:bg-gold-light transition-colors"
+              className="w-full bg-gold text-white text-[11px] font-body font-bold tracking-[0.1em] uppercase py-3 hover:bg-gold-light transition-colors"
             >
               Print / Save PDF
             </button>
@@ -483,5 +485,6 @@ export default function PostcardPage() {
         </div>
       </div>
     </div>
+    </PinGate>
   );
 }

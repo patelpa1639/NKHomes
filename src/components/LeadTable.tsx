@@ -29,7 +29,7 @@ function ScoreBadge({ score, tier }: { score: number; tier: string }) {
       ? 'text-gold bg-gold/[0.12] border-gold/25'
       : tier === 'warm'
         ? 'text-warning bg-warning/[0.08] border-warning/20'
-        : 'text-text-muted bg-white/[0.03] border-border-custom';
+        : 'text-text-muted bg-black/[0.02] border-border-custom';
 
   return (
     <span className={`inline-flex items-center justify-center w-10 h-7 border text-[11px] font-body font-bold tabular-nums ${styles}`}>
@@ -45,7 +45,7 @@ function EquityBar({ equity, maxEquity }: { equity: number; maxEquity: number })
       <span className="text-[11px] font-body font-medium text-text-secondary tabular-nums whitespace-nowrap">
         {formatCurrency(equity)}
       </span>
-      <div className="w-14 h-1 bg-white/[0.04] overflow-hidden">
+      <div className="w-14 h-1 bg-black/[0.06] overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-gold/40 to-gold/70 transition-all duration-500"
           style={{ width: `${pct}%` }}
@@ -65,9 +65,9 @@ function OutreachDots({
   onToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
 }) {
   const dots: { key: 'postcard' | 'email' | 'text'; label: string; activeColor: string; dimBg: string }[] = [
-    { key: 'postcard', label: 'P', activeColor: 'bg-gold text-bg-primary', dimBg: 'hover:bg-gold/10' },
-    { key: 'email', label: 'E', activeColor: 'bg-success text-bg-primary', dimBg: 'hover:bg-success/10' },
-    { key: 'text', label: 'T', activeColor: 'bg-warning text-bg-primary', dimBg: 'hover:bg-warning/10' },
+    { key: 'postcard', label: 'P', activeColor: 'bg-gold text-white', dimBg: 'hover:bg-gold/10' },
+    { key: 'email', label: 'E', activeColor: 'bg-success text-white', dimBg: 'hover:bg-success/10' },
+    { key: 'text', label: 'T', activeColor: 'bg-warning text-white', dimBg: 'hover:bg-warning/10' },
   ];
 
   return (
@@ -203,7 +203,7 @@ function ExpandedRow({
                         }
                       `}
                     >
-                      <span className={`w-5 h-5 flex items-center justify-center text-[9px] font-bold ${outreach[field] ? 'bg-gold text-bg-primary' : 'border border-border-strong text-text-muted'}`}>
+                      <span className={`w-5 h-5 flex items-center justify-center text-[9px] font-bold ${outreach[field] ? 'bg-gold text-white' : 'border border-border-strong text-text-muted'}`}>
                         {outreach[field] ? '\u2713' : icons[field]}
                       </span>
                       <span className="font-medium">{labels[field]}</span>
@@ -415,8 +415,8 @@ function LeadRow({
         onClick={() => onToggleRow(lead.address)}
         className={`
           cursor-pointer transition-all duration-150 border-b border-border-custom text-[12px] font-body
-          ${isEven ? 'bg-transparent' : 'bg-white/[0.01]'}
-          ${isExpanded ? 'bg-gold/[0.03] border-b-gold/10' : 'hover:bg-white/[0.02]'}
+          ${isEven ? 'bg-transparent' : 'bg-black/[0.015]'}
+          ${isExpanded ? 'bg-gold/[0.04] border-b-gold/15' : 'hover:bg-black/[0.02]'}
           ${outreach.priority ? 'border-l-2 border-l-gold/60' : ''}
         `}
       >
@@ -456,7 +456,7 @@ function LeadRow({
           {outreach.notes ? (
             <div className="w-1.5 h-1.5 bg-gold/60 mx-auto" title={outreach.notes} />
           ) : (
-            <div className="w-1.5 h-1.5 bg-white/[0.06] mx-auto" />
+            <div className="w-1.5 h-1.5 bg-black/[0.08] mx-auto" />
           )}
         </td>
       </tr>
