@@ -256,6 +256,8 @@ function ExpandedRow({
   );
 }
 
+const LEADS_PER_PAGE = 25;
+
 export default function LeadTable({
   leads,
   sortField,
@@ -269,8 +271,23 @@ export default function LeadTable({
   onDeleteAll,
 }: LeadTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const maxEquity = Math.max(...leads.map((l) => l.equity), 1);
+  const totalPages = Math.max(1, Math.ceil(leads.length / LEADS_PER_PAGE));
+
+  // Reset to page 1 when leads change (filters, sort, etc.)
+  const leadsKey = leads.map((l) => l.address).join(',');
+  const [prevLeadsKey, setPrevLeadsKey] = useState(leadsKey);
+  if (leadsKey !== prevLeadsKey) {
+    setPrevLeadsKey(leadsKey);
+    if (currentPage > Math.ceil(leads.length / LEADS_PER_PAGE)) {
+      setCurrentPage(1);
+    }
+  }
+
+  const startIdx = (currentPage - 1) * LEADS_PER_PAGE;
+  const paginatedLeads = leads.slice(startIdx, startIdx + LEADS_PER_PAGE);
 
   const toggleRow = useCallback((address: string) => {
     setExpandedRow((prev) => (prev === address ? null : address));
@@ -358,7 +375,7 @@ export default function LeadTable({
             </tr>
           </thead>
           <tbody>
-            {leads.map((lead, index) => {
+            {paginatedLeads.map((lead, index) => {
               const outreach = getOutreach(lead.address);
               const isExpanded = expandedRow === lead.address;
               return (
@@ -380,6 +397,64 @@ export default function LeadTable({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-[11px] text-text-muted/50 font-body">
+            Showing {startIdx + 1}&ndash;{Math.min(startIdx + LEADS_PER_PAGE, leads.length)} of {leads.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="px-2 py-1.5 text-[11px] font-body text-text-muted hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              First
+            </button>
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-2 py-1.5 text-[11px] font-body text-text-muted hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Prev
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+              .map((page, idx, arr) => (
+                <span key={page} className="flex items-center">
+                  {idx > 0 && arr[idx - 1] !== page - 1 && (
+                    <span className="text-[11px] text-text-muted/30 px-1">&hellip;</span>
+                  )}
+                  <button
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-7 h-7 text-[11px] font-body font-medium transition-colors ${
+                      page === currentPage
+                        ? 'bg-gold/[0.12] text-gold border border-gold/25'
+                        : 'text-text-muted hover:text-text-secondary hover:bg-black/[0.03]'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                </span>
+              ))}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-2 py-1.5 text-[11px] font-body text-text-muted hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="px-2 py-1.5 text-[11px] font-body text-text-muted hover:text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Last
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

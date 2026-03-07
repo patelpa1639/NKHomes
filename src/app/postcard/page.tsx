@@ -51,6 +51,9 @@ export default function PostcardPage() {
     ctaText: 'Scan for Your Free Home Value Report',
   });
   const [qrDataUrl, setQrDataUrl] = useState('');
+  const [leadSearch, setLeadSearch] = useState('');
+  const [showLeadDropdown, setShowLeadDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
 
@@ -81,6 +84,27 @@ export default function PostcardPage() {
   useEffect(() => {
     generateQR(postcardData.recipientAddress);
   }, [postcardData.recipientAddress, generateQR]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowLeadDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredLeads = leads.filter((lead) => {
+    if (!leadSearch) return true;
+    const q = leadSearch.toLowerCase();
+    return (
+      lead.address.toLowerCase().includes(q) ||
+      lead.neighborhood.toLowerCase().includes(q) ||
+      String(lead.score).includes(q)
+    );
+  });
 
   const selectLead = (lead: Lead) => {
     setSelectedLead(lead);
@@ -158,23 +182,55 @@ export default function PostcardPage() {
           {/* Left Panel: Controls */}
           <div className="space-y-5">
             {/* Select Lead */}
-            <div>
+            <div ref={searchRef}>
               <p className="text-[10px] text-gold/70 tracking-[0.15em] uppercase font-body font-semibold mb-2">Select Lead</p>
-              <select
-                onChange={(e) => {
-                  const lead = leads.find((l) => l.address === e.target.value);
-                  if (lead) selectLead(lead);
-                }}
-                value={selectedLead?.address || ''}
-                className="w-full bg-bg-card/60 border border-border-custom text-text-secondary text-[12px] font-body px-3 py-2.5 focus:border-gold/30 appearance-none cursor-pointer"
-              >
-                <option value="">Choose a lead...</option>
-                {leads.map((lead) => (
-                  <option key={lead.address} value={lead.address}>
-                    {lead.address} (Score: {lead.score})
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={leadSearch}
+                  onChange={(e) => {
+                    setLeadSearch(e.target.value);
+                    setShowLeadDropdown(true);
+                  }}
+                  onFocus={() => setShowLeadDropdown(true)}
+                  placeholder={selectedLead ? selectedLead.address : 'Search by address, area, or score...'}
+                  className="w-full bg-bg-card/60 border border-border-custom text-text-secondary text-[12px] font-body px-3 py-2.5 focus:border-gold/30 placeholder:text-text-muted/50"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted/40 text-[10px]">
+                  {filteredLeads.length}/{leads.length}
+                </span>
+                {showLeadDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-bg-card border border-border-custom shadow-lg z-50 max-h-[240px] overflow-y-auto">
+                    {filteredLeads.length === 0 ? (
+                      <p className="px-3 py-4 text-[11px] text-text-muted/50 font-body text-center">No leads match</p>
+                    ) : (
+                      filteredLeads.map((lead) => (
+                        <button
+                          key={lead.address}
+                          onClick={() => {
+                            selectLead(lead);
+                            setLeadSearch('');
+                            setShowLeadDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-[11px] font-body border-b border-border-custom last:border-b-0 hover:bg-gold/[0.06] transition-colors flex items-center justify-between gap-2 ${
+                            selectedLead?.address === lead.address ? 'bg-gold/[0.08]' : ''
+                          }`}
+                        >
+                          <span className="text-text-secondary truncate">{lead.address}</span>
+                          <span className="flex items-center gap-2 flex-shrink-0">
+                            <span className="text-text-muted/50 text-[10px]">{lead.neighborhood}</span>
+                            <span className={`w-7 h-5 flex items-center justify-center text-[9px] font-bold ${
+                              lead.score >= 80 ? 'bg-gold/[0.12] text-gold' : lead.score >= 50 ? 'bg-warning/[0.08] text-warning' : 'bg-black/[0.03] text-text-muted'
+                            }`}>
+                              {lead.score}
+                            </span>
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
               {selectedLead && (
                 <div className="mt-2 p-3 bg-bg-card/40 border border-border-custom text-[11px] font-body space-y-1">
                   <div className="flex justify-between"><span className="text-text-muted">Est. Value</span><span className="text-gold font-medium">{postcardData.estimatedValue}</span></div>
