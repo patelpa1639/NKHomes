@@ -1,35 +1,118 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { HomeValueSubmission, loadSubmissions, updateSubmission } from '@/lib/submissions';
+import { HomeValueSubmission } from '@/lib/submissions';
 
 export default function SubmissionsPanel() {
   const [submissions, setSubmissions] = useState<HomeValueSubmission[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const refresh = useCallback(() => {
-    setSubmissions(loadSubmissions());
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch('/api/submissions');
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      setSubmissions(data);
+      setError(false);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     refresh();
-    // Poll for new submissions every 10 seconds
-    const interval = setInterval(refresh, 10000);
+    // Poll for new submissions every 15 seconds
+    const interval = setInterval(refresh, 15000);
     return () => clearInterval(interval);
   }, [refresh]);
 
-  const handleStatusChange = (id: string, status: 'new' | 'contacted' | 'converted') => {
-    updateSubmission(id, { status });
-    refresh();
+  const handleStatusChange = async (id: string, status: 'new' | 'contacted' | 'converted') => {
+    // Optimistic update
+    setSubmissions((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, status } : s))
+    );
+    try {
+      await fetch('/api/submissions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      });
+    } catch {
+      refresh(); // Revert on error
+    }
   };
 
-  const handleNotesChange = (id: string, notes: string) => {
-    updateSubmission(id, { notes });
-    refresh();
+  const handleNotesChange = async (id: string, notes: string) => {
+    try {
+      await fetch('/api/submissions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, notes }),
+      });
+    } catch {
+      // Silent fail for notes
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="relative z-10 max-w-[1440px] mx-auto px-8 mb-6">
+        <div className="border border-border-custom bg-bg-card/30">
+          <div className="flex items-center justify-center px-5 py-6">
+            <div className="w-4 h-4 border-2 border-gold/30 border-t-gold animate-spin mr-3" />
+            <p className="text-[11px] text-text-muted font-body">Loading submissions...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && submissions.length === 0) {
+    return (
+      <div className="relative z-10 max-w-[1440px] mx-auto px-8 mb-6">
+        <div className="border border-border-custom bg-bg-card/30">
+          <div className="flex items-center justify-center px-5 py-5 gap-3">
+            <div className="w-5 h-5 border border-warning/30 bg-warning/[0.06] flex items-center justify-center">
+              <span className="text-warning text-[11px] font-bold">!</span>
+            </div>
+            <div>
+              <p className="text-[11px] text-text-muted font-body">
+                Submissions storage not connected yet.
+              </p>
+              <p className="text-[10px] text-text-muted/60 font-body mt-0.5">
+                Link an Upstash Redis database in your Vercel project settings to receive homeowner submissions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (submissions.length === 0) {
-    return null;
+    return (
+      <div className="relative z-10 max-w-[1440px] mx-auto px-8 mb-6">
+        <div className="border border-border-custom bg-bg-card/30">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border-custom bg-bg-elevated/40">
+            <p className="text-[10px] text-gold/70 tracking-[0.15em] uppercase font-body font-semibold">
+              Home Value Submissions
+            </p>
+          </div>
+          <div className="flex items-center justify-center px-5 py-8">
+            <div className="text-center">
+              <p className="text-[12px] text-text-muted font-body mb-1">No submissions yet</p>
+              <p className="text-[10px] text-text-muted/50 font-body">
+                When homeowners fill out the form from your postcards, their info will appear here.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const newCount = submissions.filter((s) => s.status === 'new').length;

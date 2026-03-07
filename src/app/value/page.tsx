@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { saveSubmission } from '@/lib/submissions';
 import { sampleLeads } from '@/lib/sampleData';
 import { processLead } from '@/lib/scoring';
 import { Lead } from '@/lib/types';
@@ -38,16 +37,22 @@ function HomeValueContent() {
     }
   }, [addressParam]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate a brief delay for UX
-    setTimeout(() => {
-      saveSubmission(formData);
-      setSubmitted(true);
-      setIsSubmitting(false);
-    }, 800);
+    try {
+      await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+    } catch (err) {
+      console.error('Failed to save submission:', err);
+    }
+
+    setSubmitted(true);
+    setIsSubmitting(false);
   };
 
   const update = (field: string, value: string) => {
