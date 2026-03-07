@@ -152,9 +152,11 @@ export function parseCSV(file: File): Promise<RawLead[]> {
                 address += ` VA ${zip}`;
               }
 
-              const taxVal = mapped.tax_assessed_value
+              // Tax values under $1000 are garbage data ($0, $1, etc.)
+              const rawTax = mapped.tax_assessed_value
                 ? parsePrice(mapped.tax_assessed_value)
                 : 0;
+              const taxVal = rawTax >= 1000 ? rawTax : 0;
 
               return {
                 address,
