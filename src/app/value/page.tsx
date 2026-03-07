@@ -1,17 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { saveSubmission } from '@/lib/submissions';
+import { sampleLeads } from '@/lib/sampleData';
+import { processLead } from '@/lib/scoring';
+import { Lead } from '@/lib/types';
 
-export default function HomeValuePage() {
+function HomeValueContent() {
+  const searchParams = useSearchParams();
+  const addressParam = searchParams.get('address') || '';
+
+  // Process leads to find a match for the address
+  const allLeads = useMemo(() => sampleLeads.map(processLead), []);
+
+  const matchedLead: Lead | null = useMemo(() => {
+    if (!addressParam) return null;
+    const decoded = decodeURIComponent(addressParam).toLowerCase();
+    return allLeads.find((l) => l.address.toLowerCase() === decoded) || null;
+  }, [addressParam, allLeads]);
+
+  const isPropertySpecific = !!addressParam;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: '',
+    address: addressParam,
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pre-fill address from URL param
+  useEffect(() => {
+    if (addressParam) {
+      setFormData((prev) => ({ ...prev, address: addressParam }));
+    }
+  }, [addressParam]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +74,10 @@ export default function HomeValuePage() {
             </h2>
             <p className="text-text-secondary font-body text-[15px] leading-relaxed mb-3">
               Your home value report is being prepared. Neena Kalra will reach out
-              with a personalized market analysis for your property.
+              with a personalized market analysis for your property
+              {isPropertySpecific && formData.address ? (
+                <> at <span className="text-gold font-medium">{formData.address}</span></>
+              ) : null}.
             </p>
             <p className="text-text-muted font-body text-[13px]">
               Expect to hear from us within 24 hours.
@@ -100,19 +128,86 @@ export default function HomeValuePage() {
             </div>
           </div>
 
-          <p className="text-[11px] text-gold/70 tracking-[0.25em] uppercase font-body font-semibold mb-4">
-            Complimentary Market Analysis
-          </p>
+          {isPropertySpecific ? (
+            <>
+              <p className="text-[11px] text-gold/70 tracking-[0.25em] uppercase font-body font-semibold mb-4">
+                Your Personalized Report
+              </p>
 
-          <h1 className="font-display text-4xl md:text-5xl text-text-primary leading-tight mb-5">
-            What&apos;s Your Home<br />
-            <span className="text-gold">Worth Today?</span>
-          </h1>
+              <h1 className="font-display text-3xl md:text-4xl text-text-primary leading-tight mb-5">
+                We Have a Report Ready<br />
+                <span className="text-gold">For Your Property</span>
+              </h1>
 
-          <p className="text-text-secondary font-body text-[15px] leading-relaxed max-w-md mx-auto">
-            Get a personalized home value report with current market data
-            for Loudoun &amp; Fairfax County. No obligation, completely free.
-          </p>
+              {/* Property-specific address card */}
+              <div className="max-w-md mx-auto mb-6">
+                <div className="border border-gold/20 bg-gold/[0.04] px-6 py-4">
+                  <p className="text-[10px] text-gold/60 tracking-[0.2em] uppercase font-body font-semibold mb-2">
+                    Property Address
+                  </p>
+                  <p className="text-text-primary font-display text-lg font-semibold">
+                    {addressParam}
+                  </p>
+                </div>
+              </div>
+
+              {/* Matched lead data — show estimated value if we have data */}
+              {matchedLead && (
+                <div className="max-w-md mx-auto mb-6">
+                  <div className="grid grid-cols-3 gap-px bg-border-custom">
+                    <div className="bg-bg-card/60 px-4 py-3 text-center">
+                      <p className="font-display text-xl text-gold font-bold">
+                        ${(matchedLead.estimated_value / 1000).toFixed(0)}K
+                      </p>
+                      <p className="text-[9px] text-text-muted font-body mt-1 tracking-wider uppercase">
+                        Est. Value
+                      </p>
+                    </div>
+                    <div className="bg-bg-card/60 px-4 py-3 text-center">
+                      <p className="font-display text-xl text-gold font-bold">
+                        ${(matchedLead.equity / 1000).toFixed(0)}K
+                      </p>
+                      <p className="text-[9px] text-text-muted font-body mt-1 tracking-wider uppercase">
+                        Est. Equity
+                      </p>
+                    </div>
+                    <div className="bg-bg-card/60 px-4 py-3 text-center">
+                      <p className="font-display text-xl text-gold font-bold">
+                        {matchedLead.neighborhood}
+                      </p>
+                      <p className="text-[9px] text-text-muted font-body mt-1 tracking-wider uppercase">
+                        Neighborhood
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-text-muted/40 font-body mt-2 italic">
+                    * Estimates based on recent comparable sales data
+                  </p>
+                </div>
+              )}
+
+              <p className="text-text-secondary font-body text-[15px] leading-relaxed max-w-md mx-auto">
+                Complete the form below and Neena Kalra will send you a detailed,
+                personalized market analysis for your home. Completely free.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[11px] text-gold/70 tracking-[0.25em] uppercase font-body font-semibold mb-4">
+                Complimentary Market Analysis
+              </p>
+
+              <h1 className="font-display text-4xl md:text-5xl text-text-primary leading-tight mb-5">
+                What&apos;s Your Home<br />
+                <span className="text-gold">Worth Today?</span>
+              </h1>
+
+              <p className="text-text-secondary font-body text-[15px] leading-relaxed max-w-md mx-auto">
+                Get a personalized home value report with current market data
+                for Loudoun &amp; Fairfax County. No obligation, completely free.
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -129,8 +224,18 @@ export default function HomeValuePage() {
               value={formData.address}
               onChange={(e) => update('address', e.target.value)}
               placeholder="123 Main St, Ashburn VA 20148"
-              className="w-full bg-bg-card/60 border border-border-custom text-text-primary text-[13px] font-body px-4 py-3 focus:border-gold/30 placeholder:text-text-muted/50 transition-colors"
+              readOnly={isPropertySpecific}
+              className={`w-full border text-text-primary text-[13px] font-body px-4 py-3 transition-colors ${
+                isPropertySpecific
+                  ? 'bg-gold/[0.06] border-gold/20 cursor-default'
+                  : 'bg-bg-card/60 border-border-custom focus:border-gold/30 placeholder:text-text-muted/50'
+              }`}
             />
+            {isPropertySpecific && (
+              <p className="text-[10px] text-gold/50 font-body mt-1">
+                ✓ Address provided from your personalized postcard
+              </p>
+            )}
           </div>
 
           <div>
@@ -185,6 +290,8 @@ export default function HomeValuePage() {
                 <span className="w-4 h-4 border-2 border-bg-primary/30 border-t-bg-primary animate-spin" />
                 Processing...
               </span>
+            ) : isPropertySpecific ? (
+              'Get My Free Report'
             ) : (
               'Get My Home Value'
             )}
@@ -223,5 +330,17 @@ export default function HomeValuePage() {
         <div className="h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
       </div>
     </div>
+  );
+}
+
+export default function HomeValuePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold/30 border-t-gold animate-spin" />
+      </div>
+    }>
+      <HomeValueContent />
+    </Suspense>
   );
 }
