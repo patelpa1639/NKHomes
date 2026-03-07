@@ -39,6 +39,25 @@ export default function Header() {
             </div>
           </div>
 
+          {/* Center: Navigation */}
+          <nav className="flex items-center gap-6">
+            <a href="/" className="text-[11px] text-text-primary font-body font-medium hover:text-gold transition-colors tracking-wider uppercase">
+              Dashboard
+            </a>
+            <a href="/postcard" className="text-[11px] text-text-muted font-body font-medium hover:text-gold transition-colors tracking-wider uppercase">
+              Postcards
+            </a>
+            <a href="/sop" className="text-[11px] text-text-muted font-body font-medium hover:text-gold transition-colors tracking-wider uppercase">
+              SOP
+            </a>
+            <a href="/value" target="_blank" className="text-[11px] text-text-muted font-body font-medium hover:text-gold transition-colors tracking-wider uppercase flex items-center gap-1">
+              Landing Page
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" className="opacity-50">
+                <path d="M6 2h8v8M14 2L6 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+              </svg>
+            </a>
+          </nav>
+
           {/* Right: Badge + Date */}
           <div className="flex items-center gap-8">
             <div className="relative border border-gold/20 bg-gold/[0.04] px-5 py-2">

@@ -7,6 +7,7 @@ import StatsBar from '@/components/StatsBar';
 import UploadZone from '@/components/UploadZone';
 import FilterBar from '@/components/FilterBar';
 import LeadTable from '@/components/LeadTable';
+import SubmissionsPanel from '@/components/SubmissionsPanel';
 import { Lead, Filters, SortField, SortDirection, OutreachStatus } from '@/lib/types';
 import { processLead } from '@/lib/scoring';
 import { parseCSV } from '@/lib/csvParser';
@@ -247,6 +248,8 @@ export default function Dashboard() {
           leads={leads}
           onExport={handleExport}
         />
+
+        <SubmissionsPanel />
 
         <LeadTable
           leads={filteredLeads}
