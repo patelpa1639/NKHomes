@@ -15,6 +15,7 @@ import { sampleLeads } from '@/lib/sampleData';
 import { getOutreach, saveOutreach, getOutreachLevel } from '@/lib/persistence';
 import { exportLeadsToCSV } from '@/lib/exportCsv';
 import PinGate from '@/components/PinGate';
+import GreetingCard from '@/components/GreetingCard';
 
 const DEFAULT_FILTERS: Filters = {
   armType: '',
@@ -255,6 +256,8 @@ export default function Dashboard() {
     <PinGate>
     <div className="min-h-screen flex flex-col">
       <Header />
+
+      <GreetingCard />
 
       <main className="flex-1 py-6">
         <StatsBar leads={filteredLeads} getOutreach={getOutreachCached} />
