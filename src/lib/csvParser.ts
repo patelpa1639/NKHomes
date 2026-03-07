@@ -9,6 +9,7 @@ const COLUMN_MAPPINGS: Record<string, string[]> = {
     'close price',
     'selling price',
     'list price',
+    'current price',
     'price',
     'original price',
     'saleprice',
@@ -21,6 +22,7 @@ const COLUMN_MAPPINGS: Record<string, string[]> = {
     'sold date',
     'closing date',
     'settlement date',
+    'status contractual search date',
     'closedate',
     'saledate',
     'solddate',
@@ -37,6 +39,7 @@ const COLUMN_MAPPINGS: Record<string, string[]> = {
     'total sq ft',
     'approx sq ft',
     'above grade sqft',
+    'above grade finished sqft',
   ],
   property_type: [
     'property type',
@@ -56,6 +59,13 @@ const COLUMN_MAPPINGS: Record<string, string[]> = {
     'subdivision/neighborhood',
     'subdivision name',
     'sub-division',
+  ],
+  tax_assessed_value: [
+    'tax assessed value',
+    'assessed value',
+    'tax value',
+    'tax assessment',
+    'assessed',
   ],
 };
 
@@ -83,6 +93,18 @@ function parseNumber(value: string | number): number {
   return parseFloat(value.replace(/[,\s]/g, '')) || 0;
 }
 
+function parseBaths(value: string | number): number {
+  if (typeof value === 'number') return value;
+  // Handle "4/1" format (full baths / half baths) from Bright MLS
+  if (value.includes('/')) {
+    const parts = value.split('/');
+    const full = parseFloat(parts[0]) || 0;
+    const half = parseFloat(parts[1]) || 0;
+    return full + half * 0.5;
+  }
+  return parseFloat(value.replace(/[,\s]/g, '')) || 0;
+}
+
 export function parseCSV(file: File): Promise<RawLead[]> {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
@@ -100,6 +122,10 @@ export function parseCSV(file: File): Promise<RawLead[]> {
             }
           });
 
+          // Also grab raw city/zip columns for address enrichment
+          const cityCol = headers.find((h) => normalizeColumnName(h) === 'city');
+          const zipCol = headers.find((h) => normalizeColumnName(h).includes('zip'));
+
           const leads: RawLead[] = (results.data as Record<string, string>[])
             .map((row: Record<string, string>) => {
               const mapped: Record<string, string | number> = {};
@@ -115,15 +141,31 @@ export function parseCSV(file: File): Promise<RawLead[]> {
                 return null;
               }
 
+              // Enrich address with city/zip if not already included
+              let address = String(mapped.address).trim();
+              const city = cityCol ? (row[cityCol] || '').trim() : '';
+              const zip = zipCol ? (row[zipCol] || '').trim() : '';
+              if (city && !address.toLowerCase().includes(city.toLowerCase())) {
+                address += `, ${city}`;
+              }
+              if (zip && !address.includes(zip)) {
+                address += ` VA ${zip}`;
+              }
+
+              const taxVal = mapped.tax_assessed_value
+                ? parsePrice(mapped.tax_assessed_value)
+                : 0;
+
               return {
-                address: String(mapped.address).trim(),
+                address,
                 sale_price: parsePrice(mapped.sale_price),
                 sale_date: String(mapped.sale_date).trim(),
                 beds: parseNumber(mapped.beds || '0'),
-                baths: parseNumber(mapped.baths || '0'),
+                baths: parseBaths(mapped.baths || '0'),
                 sqft: parseNumber(mapped.sqft || '0'),
                 property_type: String(mapped.property_type || 'Unknown').trim(),
                 neighborhood: String(mapped.neighborhood || 'Unknown').trim(),
+                tax_assessed_value: taxVal,
               } as RawLead;
             })
             .filter(Boolean) as RawLead[];

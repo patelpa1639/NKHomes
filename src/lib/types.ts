@@ -7,6 +7,7 @@ export interface RawLead {
   sqft: number;
   property_type: string;
   neighborhood: string;
+  tax_assessed_value?: number;
 }
 
 export interface Lead extends RawLead {
@@ -17,6 +18,7 @@ export interface Lead extends RawLead {
   estimated_value: number;
   mortgage_balance: number;
   equity: number;
+  tax_assessed_value: number;
   score: number;
   score_tier: 'high' | 'warm' | 'monitor';
   score_breakdown: ScoreBreakdown;

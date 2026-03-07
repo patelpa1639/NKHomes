@@ -65,6 +65,7 @@ export function processLead(raw: RawLead): Lead {
     estimated_value: Math.round(estimatedValue),
     mortgage_balance: Math.round(mortgageBalance),
     equity: Math.round(equity),
+    tax_assessed_value: raw.tax_assessed_value || 0,
     score,
     score_tier: scoreTier,
     score_breakdown: scoreBreakdown,

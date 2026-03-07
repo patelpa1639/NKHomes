@@ -163,13 +163,28 @@ function ExpandedRow({
 
               <div className="mt-8">
                 <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
-                  Equity Estimate
+                  Value &amp; Equity Estimate
                 </p>
                 <div className="space-y-3 text-[12px] font-body">
                   <div className="flex justify-between items-baseline">
-                    <span className="text-text-muted">Current Value</span>
+                    <span className="text-text-muted">Est. Value <span className="text-[9px]">(6% appr.)</span></span>
                     <span className="text-text-secondary font-medium">{formatCurrency(lead.estimated_value)}</span>
                   </div>
+                  {lead.tax_assessed_value > 0 && (
+                    <>
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-text-muted">Tax Assessed Value</span>
+                        <span className="text-text-secondary font-medium">{formatCurrency(lead.tax_assessed_value)}</span>
+                      </div>
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-text-muted/60 text-[10px]">Difference</span>
+                        <span className={`text-[10px] font-medium ${lead.estimated_value >= lead.tax_assessed_value ? 'text-success' : 'text-alert'}`}>
+                          {lead.estimated_value >= lead.tax_assessed_value ? '+' : ''}{formatCurrency(lead.estimated_value - lead.tax_assessed_value)}
+                          {' '}({lead.tax_assessed_value > 0 ? ((lead.estimated_value / lead.tax_assessed_value - 1) * 100).toFixed(1) : '0'}%)
+                        </span>
+                      </div>
+                    </>
+                  )}
                   <div className="flex justify-between items-baseline">
                     <span className="text-text-muted">Mortgage (80% LTV)</span>
                     <span className="text-text-secondary font-medium">{formatCurrency(lead.mortgage_balance)}</span>
