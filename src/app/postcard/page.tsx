@@ -260,7 +260,7 @@ export default function PostcardPage() {
             </p>
 
             {/* ===== FRONT SIDE ===== */}
-            <p className="text-[10px] text-text-muted font-body mb-2 tracking-wider uppercase">Front</p>
+            <p className="text-[10px] text-text-muted font-body mb-2 tracking-wider uppercase">Front — Brand Card</p>
             <div ref={frontRef}>
               <div
                 style={{
@@ -273,153 +273,138 @@ export default function PostcardPage() {
                   display: 'flex',
                 }}
               >
-                {/* Left: Cropped card image — shows Neena's photo + gold accents, hides original QR */}
-                <div style={{ width: '50%', position: 'relative', overflow: 'hidden' }}>
+                {/* Subtle diamond crosshatch background */}
+                <div style={{
+                  position: 'absolute', inset: 0, opacity: 0.06,
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(212,168,83,0.3) 20px, rgba(212,168,83,0.3) 21px), repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(212,168,83,0.3) 20px, rgba(212,168,83,0.3) 21px)',
+                }} />
+
+                {/* Gold accent corners */}
+                <div style={{ position: 'absolute', top: 12, left: 12 }}>
+                  <div style={{ width: '20px', height: '1px', background: '#d4a853' }} />
+                  <div style={{ width: '1px', height: '20px', background: '#d4a853' }} />
+                </div>
+                <div style={{ position: 'absolute', top: 12, right: 12 }}>
+                  <div style={{ width: '20px', height: '1px', background: '#d4a853', marginLeft: 'auto' }} />
+                  <div style={{ width: '1px', height: '20px', background: '#d4a853', marginLeft: 'auto' }} />
+                </div>
+                <div style={{ position: 'absolute', bottom: 12, left: 12 }}>
+                  <div style={{ width: '1px', height: '20px', background: '#d4a853' }} />
+                  <div style={{ width: '20px', height: '1px', background: '#d4a853' }} />
+                </div>
+                <div style={{ position: 'absolute', bottom: 12, right: 12 }}>
+                  <div style={{ width: '1px', height: '20px', background: '#d4a853', marginLeft: 'auto' }} />
+                  <div style={{ width: '20px', height: '1px', background: '#d4a853', marginLeft: 'auto' }} />
+                </div>
+
+                {/* Left: Neena's photo cropped from card */}
+                <div style={{ width: '42%', position: 'relative', overflow: 'hidden', zIndex: 1 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/neena-card-front.png"
-                    alt="Neena Kalra — NK Homes"
+                    alt="Neena Kalra"
                     style={{
-                      width: '200%',
+                      width: '238%',
                       height: '100%',
                       objectFit: 'cover',
-                      objectPosition: 'left center',
+                      objectPosition: '0% center',
                       display: 'block',
                     }}
                   />
-                  {/* Fade edge into dark panel */}
+                  {/* Fade into dark */}
                   <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '40%',
-                    height: '100%',
+                    position: 'absolute', top: 0, right: 0, width: '50%', height: '100%',
                     background: 'linear-gradient(to left, #0a0a0a, transparent)',
                   }} />
                 </div>
 
-                {/* Right: Dark panel with headline + QR */}
+                {/* Right: Contact info — clean & modern */}
                 <div style={{
-                  width: '50%',
-                  padding: '24px 28px 20px 12px',
+                  width: '58%',
+                  padding: '28px 32px 24px 8px',
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
+                  justifyContent: 'center',
                   position: 'relative',
-                  zIndex: 1,
+                  zIndex: 2,
                 }}>
-                  {/* Gold accent corner */}
-                  <div style={{ position: 'absolute', top: 0, right: 0, width: '40px', height: '40px', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', top: '0', right: '0', width: '1px', height: '24px', background: '#d4a853' }} />
-                    <div style={{ position: 'absolute', top: '0', right: '0', width: '24px', height: '1px', background: '#d4a853' }} />
+                  {/* Name */}
+                  <p style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: '26px',
+                    fontWeight: 600,
+                    color: '#ffffff',
+                    fontStyle: 'italic',
+                    marginBottom: '2px',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Neena Kalra
+                  </p>
+                  <p style={{
+                    fontSize: '9px',
+                    color: 'rgba(212,168,83,0.7)',
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase',
+                    fontWeight: 500,
+                    marginBottom: '16px',
+                  }}>
+                    Realtor &middot; Licensed in Virginia
+                  </p>
+
+                  {/* Divider */}
+                  <div style={{ width: '40px', height: '1px', background: 'rgba(212,168,83,0.3)', marginBottom: '14px' }} />
+
+                  {/* Contact details */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginBottom: '18px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '10px', color: '#d4a853', width: '12px', textAlign: 'center' }}>&#9742;</span>
+                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.85)', fontWeight: 500, letterSpacing: '0.5px' }}>571-277-2336</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '9px', color: '#d4a853', width: '12px', textAlign: 'center' }}>&#9993;</span>
+                      <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.3px' }}>realtor.neena.kalra@gmail.com</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '10px', color: '#d4a853', width: '12px', textAlign: 'center' }}>&#9906;</span>
+                      <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.3px' }}>14291 Park Meadow Dr Ste, Chantilly VA</span>
+                    </div>
                   </div>
 
-                  {/* Headline */}
-                  <div>
+                  {/* Samson Properties */}
+                  <div style={{ paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                     <p style={{
-                      fontFamily: "'Playfair Display', serif",
-                      fontSize: '18px',
+                      fontSize: '11px',
                       fontWeight: 600,
-                      color: '#ffffff',
-                      lineHeight: 1.35,
-                      marginBottom: '10px',
+                      color: 'rgba(255,255,255,0.9)',
+                      letterSpacing: '2px',
+                      textTransform: 'uppercase',
+                      marginBottom: '3px',
                     }}>
-                      {postcardData.headline}
+                      Samson Properties
                     </p>
-                    <p style={{
-                      fontSize: '9.5px',
-                      color: 'rgba(255,255,255,0.5)',
-                      lineHeight: 1.7,
-                      maxWidth: '220px',
-                    }}>
-                      {postcardData.bodyText.slice(0, 120)}{postcardData.bodyText.length > 120 ? '...' : ''}
+                    <p style={{ fontSize: '8.5px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.5px' }}>
+                      703-378-8810 &middot; License #022522107
                     </p>
-                  </div>
-
-                  {/* QR + CTA */}
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '14px', marginTop: '12px' }}>
-                    {qrDataUrl && (
-                      <div style={{
-                        width: '72px',
-                        height: '72px',
-                        padding: '4px',
-                        background: 'white',
-                        flexShrink: 0,
-                      }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
-                      </div>
-                    )}
-                    <div>
-                      <p style={{
-                        fontSize: '8px',
-                        color: '#d4a853',
-                        letterSpacing: '1.5px',
-                        textTransform: 'uppercase',
-                        fontWeight: 600,
-                        marginBottom: '6px',
-                      }}>
-                        {postcardData.ctaText}
-                      </p>
-                      <p style={{
-                        fontSize: '8px',
-                        color: 'rgba(255,255,255,0.3)',
-                        letterSpacing: '0.5px',
-                      }}>
-                        nkhomes-arm-intelligence.vercel.app
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Bottom: NK Homes brand line */}
-                  <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid rgba(212,168,83,0.2)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{
-                        width: '22px',
-                        height: '22px',
-                        border: '1px solid rgba(212,168,83,0.4)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        <span style={{
-                          fontFamily: "'Playfair Display', serif",
-                          fontSize: '9px',
-                          fontWeight: 700,
-                          color: '#d4a853',
-                          letterSpacing: '1px',
-                        }}>NK</span>
-                      </div>
-                      <div>
-                        <p style={{
-                          fontFamily: "'Playfair Display', serif",
-                          fontSize: '10px',
-                          fontWeight: 600,
-                          color: '#ffffff',
-                          letterSpacing: '1.5px',
-                        }}>NK HOMES</p>
-                        <p style={{ fontSize: '7px', color: 'rgba(255,255,255,0.35)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                          Brokered by Samson Properties
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                {/* Gold accent bottom line */}
+                {/* Bottom gold accent line */}
                 <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'linear-gradient(90deg, transparent, #d4a853 30%, #d4a853 70%, transparent)',
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                  background: 'linear-gradient(90deg, transparent, #d4a853 20%, #d4a853 80%, transparent)',
+                  zIndex: 3,
+                }} />
+                {/* Top gold accent line */}
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+                  background: 'linear-gradient(90deg, transparent, #d4a853 20%, #d4a853 80%, transparent)',
+                  zIndex: 3,
                 }} />
               </div>
             </div>
 
             {/* ===== BACK SIDE ===== */}
-            <p className="text-[10px] text-text-muted font-body mb-2 mt-6 tracking-wider uppercase">Back — Mailing Side</p>
+            <p className="text-[10px] text-text-muted font-body mb-2 mt-6 tracking-wider uppercase">Back — Message + QR</p>
             <div ref={backRef}>
               <div
                 style={{
@@ -441,41 +426,21 @@ export default function PostcardPage() {
                     {/* NK brand */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                       <div style={{
-                        width: '24px',
-                        height: '24px',
+                        width: '24px', height: '24px',
                         border: '1px solid rgba(184,145,58,0.4)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(184,145,58,0.05)',
                       }}>
-                        <span style={{
-                          fontFamily: "'Playfair Display', serif",
-                          fontSize: '9px',
-                          fontWeight: 700,
-                          color: '#b8913a',
-                          letterSpacing: '1px',
-                        }}>NK</span>
+                        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '9px', fontWeight: 700, color: '#b8913a', letterSpacing: '1px' }}>NK</span>
                       </div>
-                      <div>
-                        <p style={{
-                          fontFamily: "'Playfair Display', serif",
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          color: '#2c2824',
-                          letterSpacing: '1.5px',
-                        }}>NK HOMES</p>
-                      </div>
+                      <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '11px', fontWeight: 600, color: '#2c2824', letterSpacing: '1.5px' }}>NK HOMES</p>
                     </div>
 
                     {/* Headline */}
                     <h3 style={{
                       fontFamily: "'Playfair Display', serif",
-                      fontSize: '17px',
-                      fontWeight: 600,
-                      color: '#2c2824',
-                      lineHeight: 1.35,
-                      marginBottom: '10px',
+                      fontSize: '17px', fontWeight: 600, color: '#2c2824',
+                      lineHeight: 1.35, marginBottom: '10px',
                     }}>
                       {postcardData.headline}
                     </h3>
@@ -485,57 +450,63 @@ export default function PostcardPage() {
                       {postcardData.bodyText}
                     </p>
 
-                    {/* CTA bar */}
-                    <div style={{
-                      background: '#0a0a0a',
-                      padding: '7px 12px',
-                      marginTop: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '10px',
-                    }}>
-                      <p style={{ fontSize: '7.5px', color: '#d4a853', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>
-                        {postcardData.ctaText}
-                      </p>
-                    </div>
-
                     {/* Contact line */}
                     <p style={{ fontSize: '7.5px', color: '#948d84', marginTop: '8px', letterSpacing: '0.3px' }}>
                       Neena Kalra &middot; 571-277-2336 &middot; realtor.neena.kalra@gmail.com
                     </p>
                   </div>
 
-                  {/* Right: Address area */}
+                  {/* Right: QR code + address area */}
                   <div style={{ width: '48%', paddingLeft: '22px', display: 'flex', flexDirection: 'column' }}>
-                    {/* Stamp */}
-                    <div style={{ textAlign: 'right', marginBottom: '16px' }}>
+                    {/* Stamp + return address row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                      <p style={{ fontSize: '7px', color: '#948d84', lineHeight: 1.6 }}>
+                        Neena Kalra<br />Samson Properties<br />Chantilly, VA 20151
+                      </p>
                       <div style={{
-                        width: '52px', height: '52px', border: '1px solid rgba(0,0,0,0.1)', display: 'inline-flex',
-                        alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.02)',
+                        width: '48px', height: '48px', border: '1px solid rgba(0,0,0,0.1)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(0,0,0,0.02)', flexShrink: 0,
                       }}>
-                        <p style={{ fontSize: '7px', color: '#ccc', textTransform: 'uppercase', letterSpacing: '1px' }}>Stamp</p>
+                        <p style={{ fontSize: '6px', color: '#ccc', textTransform: 'uppercase', letterSpacing: '1px' }}>Stamp</p>
                       </div>
                     </div>
 
                     {/* Recipient address */}
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                      <div>
-                        <p style={{ fontSize: '12px', color: '#2c2824', fontWeight: 500, lineHeight: 1.9 }}>
-                          {postcardData.recipientName}
-                        </p>
-                        <p style={{ fontSize: '11px', color: '#5c5650', lineHeight: 1.9 }}>
-                          {postcardData.recipientAddress || '123 Main Street, Ashburn VA 20148'}
-                        </p>
-                      </div>
+                    <div style={{ marginBottom: '14px' }}>
+                      <p style={{ fontSize: '12px', color: '#2c2824', fontWeight: 500, lineHeight: 1.8 }}>
+                        {postcardData.recipientName}
+                      </p>
+                      <p style={{ fontSize: '11px', color: '#5c5650', lineHeight: 1.8 }}>
+                        {postcardData.recipientAddress || '123 Main Street, Ashburn VA 20148'}
+                      </p>
                     </div>
 
-                    {/* Return address */}
-                    <div style={{ paddingTop: '10px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-                      <p style={{ fontSize: '7.5px', color: '#948d84', lineHeight: 1.7 }}>
-                        Neena Kalra, Samson Properties<br />
-                        14291 Park Meadow Dr Ste, Chantilly VA 20151
-                      </p>
+                    {/* QR Code — prominent */}
+                    <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+                      {qrDataUrl && (
+                        <div style={{
+                          width: '90px', height: '90px', padding: '5px',
+                          border: '1px solid rgba(184,145,58,0.2)',
+                          background: 'white', flexShrink: 0,
+                        }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
+                        </div>
+                      )}
+                      <div>
+                        <div style={{
+                          background: '#0a0a0a', padding: '5px 10px', marginBottom: '5px',
+                          display: 'inline-block',
+                        }}>
+                          <p style={{ fontSize: '7px', color: '#d4a853', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>
+                            {postcardData.ctaText}
+                          </p>
+                        </div>
+                        <p style={{ fontSize: '7px', color: '#948d84', letterSpacing: '0.3px' }}>
+                          Free &middot; No obligation
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
