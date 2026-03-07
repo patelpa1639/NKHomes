@@ -21,37 +21,53 @@ export default function StatsBar({ leads }: StatsBarProps) {
       : 0;
 
   const stats = [
-    { label: 'Total Leads', value: totalLeads, color: 'text-text-primary' },
-    { label: 'High Priority', value: highPriority, color: 'text-gold' },
     {
-      label: `ARM Resets ${currentYear}`,
-      value: resetsThisYear,
-      color: 'text-alert',
+      label: 'Total Leads',
+      value: totalLeads,
+      accentColor: 'text-text-primary',
+      barColor: 'bg-text-muted/30',
     },
     {
-      label: `ARM Resets ${currentYear + 1}`,
+      label: 'High Priority',
+      value: highPriority,
+      accentColor: 'text-gold',
+      barColor: 'bg-gold/30',
+    },
+    {
+      label: `Resets ${currentYear}`,
+      value: resetsThisYear,
+      accentColor: 'text-alert',
+      barColor: 'bg-alert/30',
+    },
+    {
+      label: `Resets ${currentYear + 1}`,
       value: resetsNextYear,
-      color: 'text-warning',
+      accentColor: 'text-warning',
+      barColor: 'bg-warning/30',
     },
     {
       label: 'Avg Equity',
       value: `$${avgEquity.toLocaleString()}`,
-      color: 'text-success',
+      accentColor: 'text-success',
+      barColor: 'bg-success/30',
     },
   ];
 
   return (
-    <div className="relative z-10 grid grid-cols-5 gap-4 max-w-[1600px] mx-auto px-6 py-5">
+    <div className="relative z-10 grid grid-cols-5 gap-3 max-w-[1440px] mx-auto px-8 py-6">
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="bg-bg-card border border-border-custom p-4 text-center"
+          className="relative bg-bg-card/60 backdrop-blur-sm border border-border-custom p-5 group hover:border-border-strong transition-all duration-300"
         >
-          <p className={`font-display text-3xl font-bold ${stat.color}`}>
-            {stat.value}
-          </p>
-          <p className="text-xs text-text-muted font-body mt-1 tracking-wider uppercase">
+          {/* Top accent bar */}
+          <div className={`absolute top-0 left-0 right-0 h-px ${stat.barColor}`} />
+
+          <p className="text-[11px] text-text-muted font-body font-medium tracking-[0.08em] uppercase mb-3">
             {stat.label}
+          </p>
+          <p className={`font-display text-[28px] font-bold ${stat.accentColor} leading-none`}>
+            {stat.value}
           </p>
         </div>
       ))}

@@ -1,34 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0a0a0a;
-  --bg-card: #161616;
-  --border: #2a2a2a;
-  --gold: #c9a84c;
-  --gold-light: #e2c97e;
-  --gold-dim: #7a6230;
-  --text-primary: #f5f0e8;
-  --text-muted: #888880;
-  --success: #4caf7a;
-  --warning: #e6a832;
-  --alert: #c45c4a;
+  --bg-primary: #08090c;
+  --bg-elevated: #0f1117;
+  --bg-card: #141722;
+  --bg-card-hover: #1a1e2e;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+  --gold: #d4a853;
+  --gold-light: #f0d48a;
+  --gold-dim: rgba(212, 168, 83, 0.4);
+  --gold-glow: rgba(212, 168, 83, 0.12);
+  --text-primary: #eeeae4;
+  --text-secondary: #b0aда6;
+  --text-muted: #6b6860;
+  --success: #34d399;
+  --success-dim: rgba(52, 211, 153, 0.15);
+  --warning: #fbbf24;
+  --warning-dim: rgba(251, 191, 36, 0.15);
+  --alert: #f87171;
+  --alert-dim: rgba(248, 113, 113, 0.15);
 }
 
 @theme inline {
   --color-bg-primary: var(--bg-primary);
+  --color-bg-elevated: var(--bg-elevated);
   --color-bg-card: var(--bg-card);
+  --color-bg-card-hover: var(--bg-card-hover);
   --color-border-custom: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-gold-dim: var(--gold-dim);
+  --color-gold-glow: var(--gold-glow);
   --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-success: var(--success);
+  --color-success-dim: var(--success-dim);
   --color-warning: var(--warning);
+  --color-warning-dim: var(--warning-dim);
   --color-alert: var(--alert);
-  --font-display: 'Cormorant Garamond', serif;
-  --font-body: 'Montserrat', sans-serif;
+  --color-alert-dim: var(--alert-dim);
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 * {
@@ -36,44 +52,54 @@
 }
 
 body {
-  background-color: var(--bg-primary);
+  background: linear-gradient(180deg, #08090c 0%, #0c0e14 50%, #08090c 100%);
   color: var(--text-primary);
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Noise texture overlay */
+/* Subtle radial glow behind content */
 body::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.03;
-  z-index: 0;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(212, 168, 83, 0.04) 0%, transparent 70%);
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
+  z-index: 0;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-dim);
+  background: rgba(212, 168, 83, 0.3);
 }
 
-/* Selection color */
 ::selection {
-  background: var(--gold-dim);
+  background: rgba(212, 168, 83, 0.3);
   color: var(--text-primary);
+}
+
+/* Smooth transitions for interactive elements */
+input, select, button, textarea {
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
 }

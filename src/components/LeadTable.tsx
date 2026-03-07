@@ -15,19 +15,22 @@ interface LeadTableProps {
 }
 
 function formatCurrency(value: number): string {
+  if (value >= 1000000) {
+    return '$' + (value / 1000000).toFixed(2) + 'M';
+  }
   return '$' + value.toLocaleString();
 }
 
 function ScoreBadge({ score, tier }: { score: number; tier: string }) {
-  const colorClass =
+  const styles =
     tier === 'high'
-      ? 'text-gold border-gold bg-gold/10'
+      ? 'text-gold bg-gold/[0.12] border-gold/25'
       : tier === 'warm'
-        ? 'text-warning border-warning bg-warning/10'
-        : 'text-text-muted border-border-custom bg-bg-primary';
+        ? 'text-warning bg-warning/[0.08] border-warning/20'
+        : 'text-text-muted bg-white/[0.03] border-border-custom';
 
   return (
-    <span className={`inline-block w-10 text-center py-0.5 border text-xs font-body font-bold ${colorClass}`}>
+    <span className={`inline-flex items-center justify-center w-10 h-7 border text-[11px] font-body font-bold tabular-nums ${styles}`}>
       {score}
     </span>
   );
@@ -36,11 +39,13 @@ function ScoreBadge({ score, tier }: { score: number; tier: string }) {
 function EquityBar({ equity, maxEquity }: { equity: number; maxEquity: number }) {
   const pct = maxEquity > 0 ? Math.min((equity / maxEquity) * 100, 100) : 0;
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs font-body whitespace-nowrap">{formatCurrency(equity)}</span>
-      <div className="w-16 h-1.5 bg-border-custom overflow-hidden">
+    <div className="flex items-center gap-2.5">
+      <span className="text-[11px] font-body font-medium text-text-secondary tabular-nums whitespace-nowrap">
+        {formatCurrency(equity)}
+      </span>
+      <div className="w-14 h-1 bg-white/[0.04] overflow-hidden">
         <div
-          className="h-full bg-gold-dim"
+          className="h-full bg-gradient-to-r from-gold/40 to-gold/70 transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -57,10 +62,10 @@ function OutreachDots({
   address: string;
   onToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
 }) {
-  const dots: { key: 'postcard' | 'email' | 'text'; label: string; activeColor: string }[] = [
-    { key: 'postcard', label: 'P', activeColor: 'bg-gold text-bg-primary' },
-    { key: 'email', label: 'E', activeColor: 'bg-success text-bg-primary' },
-    { key: 'text', label: 'T', activeColor: 'bg-warning text-bg-primary' },
+  const dots: { key: 'postcard' | 'email' | 'text'; label: string; activeColor: string; dimBg: string }[] = [
+    { key: 'postcard', label: 'P', activeColor: 'bg-gold text-bg-primary', dimBg: 'hover:bg-gold/10' },
+    { key: 'email', label: 'E', activeColor: 'bg-success text-bg-primary', dimBg: 'hover:bg-success/10' },
+    { key: 'text', label: 'T', activeColor: 'bg-warning text-bg-primary', dimBg: 'hover:bg-warning/10' },
   ];
 
   return (
@@ -73,8 +78,11 @@ function OutreachDots({
             onToggle(address, dot.key);
           }}
           className={`
-            w-6 h-6 text-[10px] font-body font-bold flex items-center justify-center transition-colors
-            ${outreach[dot.key] ? dot.activeColor : 'bg-bg-primary border border-border-custom text-text-muted'}
+            w-[22px] h-[22px] text-[9px] font-body font-bold flex items-center justify-center transition-all duration-200
+            ${outreach[dot.key]
+              ? dot.activeColor
+              : `bg-transparent border border-border-custom text-text-muted ${dot.dimBg}`
+            }
           `}
           title={`${dot.key}: ${outreach[dot.key] ? 'Done' : 'Not done'}`}
         >
@@ -100,129 +108,131 @@ function ExpandedRow({
 }) {
   return (
     <tr>
-      <td colSpan={11} className="bg-bg-card border-x border-b border-border-custom p-0">
-        <div className="p-6 grid grid-cols-3 gap-8">
-          {/* Column 1: Property Details */}
-          <div>
-            <h4 className="font-display text-lg text-gold mb-3">Property Details</h4>
-            <div className="space-y-2 text-xs font-body">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Address</span>
-                <span className="text-text-primary">{lead.address}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Type</span>
-                <span className="text-text-primary">{lead.property_type}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Beds / Baths</span>
-                <span className="text-text-primary">{lead.beds} bd / {lead.baths} ba</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Sq Ft</span>
-                <span className="text-text-primary">{lead.sqft.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Sale Price</span>
-                <span className="text-text-primary">{formatCurrency(lead.sale_price)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Sale Year</span>
-                <span className="text-text-primary">{lead.sale_year}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 2: Score Breakdown & Equity Calc */}
-          <div>
-            <h4 className="font-display text-lg text-gold mb-3">Score Breakdown</h4>
-            <div className="space-y-2 text-xs font-body">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Equity Points</span>
-                <span className="text-text-primary">+{lead.score_breakdown.equity_points}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">ARM Reset Points</span>
-                <span className="text-text-primary">+{lead.score_breakdown.arm_reset_points}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Neighborhood Bonus</span>
-                <span className="text-text-primary">+{lead.score_breakdown.neighborhood_points}</span>
-              </div>
-              <div className="flex justify-between border-t border-border-custom pt-2 mt-2">
-                <span className="text-gold font-medium">Total Score</span>
-                <span className="text-gold font-bold">{lead.score}</span>
+      <td colSpan={11} className="p-0">
+        <div className="bg-bg-card/80 border-t border-border-custom">
+          <div className="p-8 grid grid-cols-3 gap-10">
+            {/* Column 1: Property Details */}
+            <div>
+              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
+                Property Details
+              </p>
+              <div className="space-y-3 text-[12px] font-body">
+                {[
+                  ['Address', lead.address],
+                  ['Type', lead.property_type],
+                  ['Beds / Baths', `${lead.beds} bd / ${lead.baths} ba`],
+                  ['Sq Ft', lead.sqft.toLocaleString()],
+                  ['Sale Price', formatCurrency(lead.sale_price)],
+                  ['Sale Year', lead.sale_year],
+                ].map(([label, value]) => (
+                  <div key={String(label)} className="flex justify-between items-baseline">
+                    <span className="text-text-muted">{label}</span>
+                    <span className="text-text-secondary font-medium">{value}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <h4 className="font-display text-lg text-gold mb-3 mt-6">Equity Calculation</h4>
-            <div className="space-y-2 text-xs font-body">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Est. Current Value</span>
-                <span className="text-text-primary">{formatCurrency(lead.estimated_value)}</span>
+            {/* Column 2: Score & Equity Breakdown */}
+            <div>
+              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
+                Score Breakdown
+              </p>
+              <div className="space-y-3 text-[12px] font-body">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-text-muted">Equity</span>
+                  <span className="text-text-secondary font-medium">+{lead.score_breakdown.equity_points}</span>
+                </div>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-text-muted">ARM Reset Timing</span>
+                  <span className="text-text-secondary font-medium">+{lead.score_breakdown.arm_reset_points}</span>
+                </div>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-text-muted">Neighborhood</span>
+                  <span className="text-text-secondary font-medium">+{lead.score_breakdown.neighborhood_points}</span>
+                </div>
+                <div className="flex justify-between items-baseline pt-3 border-t border-border-custom">
+                  <span className="text-gold font-semibold">Total</span>
+                  <span className="text-gold font-bold text-lg">{lead.score}</span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Est. Mortgage (80% LTV)</span>
-                <span className="text-text-primary">{formatCurrency(lead.mortgage_balance)}</span>
-              </div>
-              <div className="flex justify-between border-t border-border-custom pt-2 mt-2">
-                <span className="text-success font-medium">Est. Equity</span>
-                <span className="text-success font-bold">{formatCurrency(lead.equity)}</span>
+
+              <div className="mt-8">
+                <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
+                  Equity Estimate
+                </p>
+                <div className="space-y-3 text-[12px] font-body">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-text-muted">Current Value</span>
+                    <span className="text-text-secondary font-medium">{formatCurrency(lead.estimated_value)}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-text-muted">Mortgage (80% LTV)</span>
+                    <span className="text-text-secondary font-medium">{formatCurrency(lead.mortgage_balance)}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline pt-3 border-t border-border-custom">
+                    <span className="text-success font-semibold">Equity</span>
+                    <span className="text-success font-bold text-lg">{formatCurrency(lead.equity)}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Column 3: Outreach & Notes */}
-          <div>
-            <h4 className="font-display text-lg text-gold mb-3">Outreach Tracking</h4>
-            <div className="space-y-3 mb-6">
-              {(['postcard', 'email', 'text'] as const).map((field) => {
-                const labels = {
-                  postcard: 'Postcard Sent',
-                  email: 'Email Sent',
-                  text: 'Text / Called',
-                };
-                return (
-                  <button
-                    key={field}
-                    onClick={() => onOutreachToggle(lead.address, field)}
-                    className={`
-                      w-full text-left px-3 py-2 text-xs font-body border transition-colors flex items-center justify-between
-                      ${outreach[field]
-                        ? 'border-gold-dim bg-gold/10 text-gold'
-                        : 'border-border-custom text-text-muted hover:border-gold-dim'
-                      }
-                    `}
-                  >
-                    <span>{labels[field]}</span>
-                    <span>{outreach[field] ? '&#x2713;' : ''}</span>
-                  </button>
-                );
-              })}
+            {/* Column 3: Outreach & Notes */}
+            <div>
+              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
+                Outreach
+              </p>
+              <div className="space-y-2 mb-5">
+                {(['postcard', 'email', 'text'] as const).map((field) => {
+                  const labels = { postcard: 'Postcard', email: 'Email', text: 'Text / Call' };
+                  const icons = { postcard: 'P', email: 'E', text: 'T' };
+                  return (
+                    <button
+                      key={field}
+                      onClick={() => onOutreachToggle(lead.address, field)}
+                      className={`
+                        w-full text-left px-4 py-2.5 text-[12px] font-body border transition-all duration-200 flex items-center gap-3
+                        ${outreach[field]
+                          ? 'border-gold/25 bg-gold/[0.06] text-gold'
+                          : 'border-border-custom text-text-muted hover:border-border-strong hover:text-text-secondary'
+                        }
+                      `}
+                    >
+                      <span className={`w-5 h-5 flex items-center justify-center text-[9px] font-bold ${outreach[field] ? 'bg-gold text-bg-primary' : 'border border-border-strong text-text-muted'}`}>
+                        {outreach[field] ? '\u2713' : icons[field]}
+                      </span>
+                      <span className="font-medium">{labels[field]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Priority Toggle */}
+              <button
+                onClick={() => onPriorityToggle(lead.address)}
+                className={`
+                  w-full text-left px-4 py-2.5 text-[12px] font-body font-semibold border mb-5 transition-all duration-200
+                  ${outreach.priority
+                    ? 'border-gold/30 bg-gold/[0.1] text-gold'
+                    : 'border-border-custom text-text-muted hover:border-border-strong hover:text-text-secondary'
+                  }
+                `}
+              >
+                {outreach.priority ? '\u2605  HIGH PRIORITY' : '\u2606  Mark Priority'}
+              </button>
+
+              {/* Notes */}
+              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-3">
+                Notes
+              </p>
+              <textarea
+                defaultValue={outreach.notes}
+                onBlur={(e) => onNotesChange(lead.address, e.target.value)}
+                placeholder="Add notes..."
+                className="w-full bg-bg-primary/50 border border-border-custom text-text-secondary text-[12px] font-body p-3 h-20 resize-none focus:border-gold/25 placeholder:text-text-muted/60"
+              />
             </div>
-
-            {/* Priority Toggle */}
-            <button
-              onClick={() => onPriorityToggle(lead.address)}
-              className={`
-                w-full text-left px-3 py-2 text-xs font-body font-medium border mb-4 transition-colors
-                ${outreach.priority
-                  ? 'border-gold bg-gold/20 text-gold'
-                  : 'border-border-custom text-text-muted hover:border-gold-dim'
-                }
-              `}
-            >
-              {outreach.priority ? '&#x2605; HIGH PRIORITY' : '&#x2606; Mark as High Priority'}
-            </button>
-
-            {/* Notes */}
-            <h4 className="font-display text-lg text-gold mb-2">Notes</h4>
-            <textarea
-              defaultValue={outreach.notes}
-              onBlur={(e) => onNotesChange(lead.address, e.target.value)}
-              placeholder="Add notes about this lead..."
-              className="w-full bg-bg-primary border border-border-custom text-text-primary text-xs font-body p-3 h-24 resize-none focus:border-gold-dim focus:outline-none placeholder:text-text-muted"
-            />
           </div>
         </div>
       </td>
@@ -259,12 +269,12 @@ export default function LeadTable({
   }) => (
     <th
       onClick={() => onSort(field)}
-      className={`px-3 py-3 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-gold transition-colors select-none ${className}`}
+      className={`px-4 py-3.5 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-[0.1em] cursor-pointer hover:text-gold/80 transition-colors select-none ${className}`}
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {children}
         {sortField === field && (
-          <span className="text-gold text-[8px]">
+          <span className="text-gold/60 text-[7px]">
             {sortDirection === 'asc' ? '\u25B2' : '\u25BC'}
           </span>
         )}
@@ -274,11 +284,11 @@ export default function LeadTable({
 
   if (leads.length === 0) {
     return (
-      <div className="relative z-10 max-w-[1600px] mx-auto px-6">
-        <div className="bg-bg-card border border-border-custom p-12 text-center">
-          <p className="font-display text-2xl text-gold-dim mb-2">No leads found</p>
-          <p className="text-xs text-text-muted font-body">
-            Try adjusting your filters or upload a new CSV file.
+      <div className="relative z-10 max-w-[1440px] mx-auto px-8">
+        <div className="bg-bg-card/40 border border-border-custom p-16 text-center">
+          <p className="font-display text-2xl text-text-muted/60 mb-2">No leads found</p>
+          <p className="text-[12px] text-text-muted/40 font-body">
+            Adjust your filters or upload a CSV.
           </p>
         </div>
       </div>
@@ -286,27 +296,36 @@ export default function LeadTable({
   }
 
   return (
-    <div className="relative z-10 max-w-[1600px] mx-auto px-6">
-      <div className="overflow-x-auto border border-border-custom">
+    <div className="relative z-10 max-w-[1440px] mx-auto px-8">
+      {/* Table count */}
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[11px] text-text-muted font-body font-medium">
+          {leads.length} lead{leads.length !== 1 ? 's' : ''}
+        </p>
+      </div>
+
+      <div className="overflow-x-auto border border-border-custom bg-bg-card/30">
         <table className="w-full">
-          <thead className="bg-bg-card border-b border-border-custom">
-            <tr>
+          <thead>
+            <tr className="border-b border-border-custom bg-bg-elevated/40">
               <SortHeader field="score">Score</SortHeader>
               <SortHeader field="address">Address</SortHeader>
-              <SortHeader field="neighborhood">Neighborhood</SortHeader>
-              <SortHeader field="sale_price">Sale Price</SortHeader>
-              <SortHeader field="sale_year">Sale Year</SortHeader>
-              <th className="px-3 py-3 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-wider">
-                ARM Type
+              <SortHeader field="neighborhood">Area</SortHeader>
+              <SortHeader field="sale_price">Sold</SortHeader>
+              <SortHeader field="sale_year">Year</SortHeader>
+              <th className="px-4 py-3.5 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-[0.1em]">
+                ARM
               </th>
-              <SortHeader field="arm5_reset_year">Reset Year</SortHeader>
-              <SortHeader field="estimated_value">Est. Value</SortHeader>
-              <SortHeader field="equity">Est. Equity</SortHeader>
-              <th className="px-3 py-3 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-wider">
-                Outreach
+              <SortHeader field="arm5_reset_year">Reset</SortHeader>
+              <SortHeader field="estimated_value">Value</SortHeader>
+              <SortHeader field="equity">Equity</SortHeader>
+              <th className="px-4 py-3.5 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-[0.1em]">
+                Touch
               </th>
-              <th className="px-3 py-3 text-left text-[10px] font-body font-semibold text-text-muted uppercase tracking-wider">
-                <span title="Notes">&#x270E;</span>
+              <th className="px-4 py-3.5 text-center text-[10px] font-body font-semibold text-text-muted uppercase tracking-[0.1em] w-10">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="inline text-text-muted">
+                  <path d="M2 14l3-1 8-8-2-2-8 8-1 3z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                </svg>
               </th>
             </tr>
           </thead>
@@ -357,54 +376,56 @@ function LeadRow({
   onNotesChange: (address: string, notes: string) => void;
   onPriorityToggle: (address: string) => void;
 }) {
+  const currentYear = new Date().getFullYear();
+
   return (
     <>
       <tr
         onClick={() => onToggleRow(lead.address)}
         className={`
-          cursor-pointer transition-colors border-b border-border-custom text-xs font-body
-          ${isEven ? 'bg-bg-primary' : 'bg-bg-card/50'}
-          ${isExpanded ? 'bg-gold/5 border-gold-dim' : 'hover:bg-gold/5'}
-          ${outreach.priority ? 'border-l-2 border-l-gold' : ''}
+          cursor-pointer transition-all duration-150 border-b border-border-custom text-[12px] font-body
+          ${isEven ? 'bg-transparent' : 'bg-white/[0.01]'}
+          ${isExpanded ? 'bg-gold/[0.03] border-b-gold/10' : 'hover:bg-white/[0.02]'}
+          ${outreach.priority ? 'border-l-2 border-l-gold/60' : ''}
         `}
       >
-        <td className="px-3 py-2.5">
+        <td className="px-4 py-3">
           <ScoreBadge score={lead.score} tier={lead.score_tier} />
         </td>
-        <td className="px-3 py-2.5 text-text-primary max-w-[250px] truncate">
+        <td className="px-4 py-3 text-text-primary font-medium max-w-[240px] truncate">
           {lead.address}
         </td>
-        <td className="px-3 py-2.5 text-text-muted">{lead.neighborhood}</td>
-        <td className="px-3 py-2.5 text-text-primary">{formatCurrency(lead.sale_price)}</td>
-        <td className="px-3 py-2.5 text-text-muted">{lead.sale_year}</td>
-        <td className="px-3 py-2.5">
-          <span className="text-text-muted">5/1</span>
-          <span className="text-border-custom mx-1">/</span>
-          <span className="text-text-muted">7/1</span>
+        <td className="px-4 py-3 text-text-muted">{lead.neighborhood}</td>
+        <td className="px-4 py-3 text-text-secondary tabular-nums">{formatCurrency(lead.sale_price)}</td>
+        <td className="px-4 py-3 text-text-muted tabular-nums">{lead.sale_year}</td>
+        <td className="px-4 py-3">
+          <span className="text-text-muted/60">5/1</span>
+          <span className="text-border-strong mx-0.5">&middot;</span>
+          <span className="text-text-muted/60">7/1</span>
         </td>
-        <td className="px-3 py-2.5">
-          <span className={lead.arm5_reset_year <= new Date().getFullYear() ? 'text-alert font-medium' : 'text-text-muted'}>
+        <td className="px-4 py-3">
+          <span className={`tabular-nums ${lead.arm5_reset_year <= currentYear ? 'text-alert font-semibold' : lead.arm5_reset_year === currentYear + 1 ? 'text-warning' : 'text-text-muted'}`}>
             {lead.arm5_reset_year}
           </span>
-          <span className="text-border-custom mx-1">/</span>
-          <span className="text-text-muted">{lead.arm7_reset_year}</span>
+          <span className="text-border-strong mx-0.5">&middot;</span>
+          <span className="text-text-muted/60 tabular-nums">{lead.arm7_reset_year}</span>
         </td>
-        <td className="px-3 py-2.5 text-text-primary">{formatCurrency(lead.estimated_value)}</td>
-        <td className="px-3 py-2.5">
+        <td className="px-4 py-3 text-text-secondary tabular-nums">{formatCurrency(lead.estimated_value)}</td>
+        <td className="px-4 py-3">
           <EquityBar equity={lead.equity} maxEquity={maxEquity} />
         </td>
-        <td className="px-3 py-2.5">
+        <td className="px-4 py-3">
           <OutreachDots
             outreach={outreach}
             address={lead.address}
             onToggle={onOutreachToggle}
           />
         </td>
-        <td className="px-3 py-2.5 text-center">
+        <td className="px-4 py-3 text-center">
           {outreach.notes ? (
-            <span className="text-gold text-sm" title={outreach.notes}>&#x270E;</span>
+            <div className="w-1.5 h-1.5 bg-gold/60 mx-auto" title={outreach.notes} />
           ) : (
-            <span className="text-text-muted text-sm">&#x270E;</span>
+            <div className="w-1.5 h-1.5 bg-white/[0.06] mx-auto" />
           )}
         </td>
       </tr>

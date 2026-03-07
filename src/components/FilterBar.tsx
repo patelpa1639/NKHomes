@@ -26,21 +26,29 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
   };
 
   const selectClass =
-    'bg-bg-card border border-border-custom text-text-primary text-xs font-body px-3 py-2 focus:border-gold-dim focus:outline-none appearance-none cursor-pointer';
+    'bg-bg-card/60 border border-border-custom text-text-secondary text-[11px] font-body font-medium px-3 py-2 focus:border-gold/30 appearance-none cursor-pointer hover:border-border-strong transition-colors';
   const inputClass =
-    'bg-bg-card border border-border-custom text-text-primary text-xs font-body px-3 py-2 focus:border-gold-dim focus:outline-none placeholder:text-text-muted';
+    'bg-bg-card/60 border border-border-custom text-text-secondary text-[11px] font-body font-medium px-3 py-2 focus:border-gold/30 placeholder:text-text-muted hover:border-border-strong transition-colors';
 
   return (
-    <div className="relative z-10 max-w-[1600px] mx-auto px-6 mb-4">
-      <div className="flex items-center gap-3 flex-wrap">
+    <div className="relative z-10 max-w-[1440px] mx-auto px-8 mb-5">
+      <div className="flex items-center gap-2.5 flex-wrap">
         {/* Search */}
-        <input
-          type="text"
-          placeholder="Search by address..."
-          value={filters.search}
-          onChange={(e) => update('search', e.target.value)}
-          className={`${inputClass} w-64`}
-        />
+        <div className="relative">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
+            <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M10.5 10.5L14.5 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search address..."
+            value={filters.search}
+            onChange={(e) => update('search', e.target.value)}
+            className={`${inputClass} w-56 pl-9`}
+          />
+        </div>
+
+        <div className="w-px h-6 bg-border-custom mx-1" />
 
         {/* ARM Type */}
         <select
@@ -48,7 +56,7 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
           onChange={(e) => update('armType', e.target.value)}
           className={selectClass}
         >
-          <option value="">All ARM Types</option>
+          <option value="">ARM Type</option>
           <option value="5/1">5/1 ARM</option>
           <option value="7/1">7/1 ARM</option>
         </select>
@@ -59,7 +67,7 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
           onChange={(e) => update('resetYear', e.target.value)}
           className={selectClass}
         >
-          <option value="">All Reset Years</option>
+          <option value="">Reset Year</option>
           {resetYears.map((year) => (
             <option key={year} value={year}>
               {year}
@@ -75,7 +83,7 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
           onChange={(e) => update('neighborhood', e.target.value)}
           className={selectClass}
         >
-          <option value="">All Neighborhoods</option>
+          <option value="">Neighborhood</option>
           {neighborhoods.map((n) => (
             <option key={n} value={n}>
               {n}
@@ -89,8 +97,8 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
           onChange={(e) => update('scoreRange', e.target.value)}
           className={selectClass}
         >
-          <option value="">All Scores</option>
-          <option value="high">High Priority (80-100)</option>
+          <option value="">Score</option>
+          <option value="high">High (80-100)</option>
           <option value="warm">Warm (50-79)</option>
           <option value="monitor">Monitor (0-49)</option>
         </select>
@@ -101,7 +109,7 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
           onChange={(e) => update('outreachStatus', e.target.value)}
           className={selectClass}
         >
-          <option value="">All Outreach</option>
+          <option value="">Outreach</option>
           <option value="untouched">Untouched</option>
           <option value="in_progress">In Progress</option>
           <option value="complete">Complete</option>
@@ -113,9 +121,13 @@ export default function FilterBar({ filters, onFilterChange, leads, onExport }: 
         {/* Export Button */}
         <button
           onClick={onExport}
-          className="border border-gold-dim text-gold text-xs font-body font-medium px-4 py-2 hover:bg-gold/10 transition-colors tracking-wider uppercase"
+          className="flex items-center gap-2 bg-gold/[0.08] border border-gold/20 text-gold/90 text-[11px] font-body font-semibold px-4 py-2 hover:bg-gold/[0.15] hover:border-gold/30 transition-all tracking-[0.08em] uppercase"
         >
-          Export CSV
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <path d="M8 11V1M4 7l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+            <path d="M2 12v2h12v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+          </svg>
+          Export
         </button>
       </div>
     </div>

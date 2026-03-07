@@ -2,13 +2,19 @@
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 border-t border-border-custom bg-bg-card mt-12">
-      <div className="max-w-[1600px] mx-auto px-6 py-4 text-center">
-        <p className="text-xs text-text-muted font-body tracking-wider">
-          NK Homes &middot; Brokered by Samson Properties &middot; Loudoun &amp; Fairfax County, VA
-        </p>
+    <footer className="relative z-10 mt-16">
+      <div className="h-px bg-gradient-to-r from-transparent via-border-strong to-transparent" />
+      <div className="bg-bg-elevated/50 backdrop-blur-sm">
+        <div className="max-w-[1440px] mx-auto px-8 py-5 flex items-center justify-between">
+          <p className="text-[10px] text-text-muted font-body tracking-[0.15em] uppercase font-medium">
+            NK Homes &middot; Brokered by Samson Properties
+          </p>
+          <p className="text-[10px] text-text-muted/60 font-body tracking-[0.1em]">
+            Loudoun &amp; Fairfax County, VA
+          </p>
+        </div>
       </div>
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-gold-dim to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
     </footer>
   );
 }
