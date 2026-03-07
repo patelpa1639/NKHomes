@@ -110,6 +110,23 @@ export default function Dashboard() {
     [getOutreachCached]
   );
 
+  const handleDeleteLead = useCallback(
+    (address: string) => {
+      setLeads((prev) => prev.filter((l) => l.address !== address));
+      setOutreachCache((prev) => {
+        const next = { ...prev };
+        delete next[address];
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleDeleteAllLeads = useCallback(() => {
+    setLeads([]);
+    setOutreachCache({});
+  }, []);
+
   const handleSort = useCallback(
     (field: SortField) => {
       if (sortField === field) {
@@ -260,6 +277,8 @@ export default function Dashboard() {
           onOutreachToggle={handleOutreachToggle}
           onNotesChange={handleNotesChange}
           onPriorityToggle={handlePriorityToggle}
+          onDeleteLead={handleDeleteLead}
+          onDeleteAll={handleDeleteAllLeads}
         />
       </main>
 

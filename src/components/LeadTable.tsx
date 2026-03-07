@@ -12,6 +12,8 @@ interface LeadTableProps {
   onOutreachToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
   onNotesChange: (address: string, notes: string) => void;
   onPriorityToggle: (address: string) => void;
+  onDeleteLead: (address: string) => void;
+  onDeleteAll: () => void;
 }
 
 function formatCurrency(value: number): string {
@@ -99,12 +101,14 @@ function ExpandedRow({
   onNotesChange,
   onPriorityToggle,
   onOutreachToggle,
+  onDeleteLead,
 }: {
   lead: Lead;
   outreach: OutreachStatus;
   onNotesChange: (address: string, notes: string) => void;
   onPriorityToggle: (address: string) => void;
   onOutreachToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
+  onDeleteLead: (address: string) => void;
 }) {
   return (
     <tr>
@@ -232,6 +236,18 @@ function ExpandedRow({
                 placeholder="Add notes..."
                 className="w-full bg-bg-primary/50 border border-border-custom text-text-secondary text-[12px] font-body p-3 h-20 resize-none focus:border-gold/25 placeholder:text-text-muted/60"
               />
+
+              {/* Delete Lead */}
+              <button
+                onClick={() => {
+                  if (confirm('Remove this lead from the table?')) {
+                    onDeleteLead(lead.address);
+                  }
+                }}
+                className="mt-4 text-[10px] text-text-muted/40 font-body hover:text-alert transition-colors tracking-wider uppercase"
+              >
+                Remove Lead
+              </button>
             </div>
           </div>
         </div>
@@ -249,6 +265,8 @@ export default function LeadTable({
   onOutreachToggle,
   onNotesChange,
   onPriorityToggle,
+  onDeleteLead,
+  onDeleteAll,
 }: LeadTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
@@ -297,11 +315,21 @@ export default function LeadTable({
 
   return (
     <div className="relative z-10 max-w-[1440px] mx-auto px-8">
-      {/* Table count */}
+      {/* Table count + Clear All */}
       <div className="flex items-center justify-between mb-3">
         <p className="text-[11px] text-text-muted font-body font-medium">
           {leads.length} lead{leads.length !== 1 ? 's' : ''}
         </p>
+        <button
+          onClick={() => {
+            if (confirm('Remove all leads from the table? Outreach data is preserved.')) {
+              onDeleteAll();
+            }
+          }}
+          className="text-[10px] text-text-muted/50 font-body hover:text-alert transition-colors tracking-wider uppercase"
+        >
+          Clear All
+        </button>
       </div>
 
       <div className="overflow-x-auto border border-border-custom bg-bg-card/30">
@@ -345,6 +373,7 @@ export default function LeadTable({
                   onOutreachToggle={onOutreachToggle}
                   onNotesChange={onNotesChange}
                   onPriorityToggle={onPriorityToggle}
+                  onDeleteLead={onDeleteLead}
                 />
               );
             })}
@@ -365,6 +394,7 @@ function LeadRow({
   onOutreachToggle,
   onNotesChange,
   onPriorityToggle,
+  onDeleteLead,
 }: {
   lead: Lead;
   outreach: OutreachStatus;
@@ -375,6 +405,7 @@ function LeadRow({
   onOutreachToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
   onNotesChange: (address: string, notes: string) => void;
   onPriorityToggle: (address: string) => void;
+  onDeleteLead: (address: string) => void;
 }) {
   const currentYear = new Date().getFullYear();
 
@@ -436,6 +467,7 @@ function LeadRow({
           onNotesChange={onNotesChange}
           onPriorityToggle={onPriorityToggle}
           onOutreachToggle={onOutreachToggle}
+          onDeleteLead={onDeleteLead}
         />
       )}
     </>
