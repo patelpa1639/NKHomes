@@ -420,11 +420,11 @@ export default function PostcardPage() {
                 {/* Top gold stripe */}
                 <div style={{ height: '3px', background: 'linear-gradient(90deg, #d4a853, #f0d48a, #d4a853)' }} />
 
-                <div style={{ padding: '20px 28px', height: 'calc(100% - 3px)', display: 'flex' }}>
+                <div style={{ padding: '16px 24px', height: 'calc(100% - 3px)', display: 'flex' }}>
                   {/* Left: Message content */}
-                  <div style={{ width: '52%', borderRight: '1px dashed rgba(0,0,0,0.12)', paddingRight: '22px', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ width: '52%', borderRight: '1px dashed rgba(0,0,0,0.12)', paddingRight: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     {/* NK brand */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                       <div style={{
                         width: '24px', height: '24px',
                         border: '1px solid rgba(184,145,58,0.4)',
@@ -439,32 +439,32 @@ export default function PostcardPage() {
                     {/* Headline */}
                     <h3 style={{
                       fontFamily: "'Playfair Display', serif",
-                      fontSize: '17px', fontWeight: 600, color: '#2c2824',
-                      lineHeight: 1.35, marginBottom: '10px',
+                      fontSize: '22px', fontWeight: 600, color: '#2c2824',
+                      lineHeight: 1.3, marginBottom: '10px',
                     }}>
                       {postcardData.headline}
                     </h3>
 
                     {/* Body text */}
-                    <p style={{ fontSize: '9.5px', color: '#5c5650', lineHeight: 1.75, flex: 1 }}>
+                    <p style={{ fontSize: '12px', color: '#5c5650', lineHeight: 1.7 }}>
                       {postcardData.bodyText}
                     </p>
 
                     {/* Contact line */}
-                    <p style={{ fontSize: '7.5px', color: '#948d84', marginTop: '8px', letterSpacing: '0.3px' }}>
+                    <p style={{ fontSize: '8.5px', color: '#948d84', marginTop: '10px', letterSpacing: '0.3px' }}>
                       Neena Kalra &middot; 571-277-2336 &middot; realtor.neena.kalra@gmail.com
                     </p>
                   </div>
 
                   {/* Right: QR code + address area */}
-                  <div style={{ width: '48%', paddingLeft: '22px', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ width: '48%', paddingLeft: '20px', display: 'flex', flexDirection: 'column' }}>
                     {/* Stamp + return address row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
                       <p style={{ fontSize: '7px', color: '#948d84', lineHeight: 1.6 }}>
                         Neena Kalra<br />Samson Properties<br />Chantilly, VA 20151
                       </p>
                       <div style={{
-                        width: '48px', height: '48px', border: '1px solid rgba(0,0,0,0.1)',
+                        width: '44px', height: '44px', border: '1px solid rgba(0,0,0,0.1)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(0,0,0,0.02)', flexShrink: 0,
                       }}>
@@ -473,33 +473,33 @@ export default function PostcardPage() {
                     </div>
 
                     {/* Recipient address */}
-                    <div style={{ marginBottom: '14px' }}>
-                      <p style={{ fontSize: '12px', color: '#2c2824', fontWeight: 500, lineHeight: 1.8 }}>
+                    <div style={{ marginBottom: '6px' }}>
+                      <p style={{ fontSize: '12px', color: '#2c2824', fontWeight: 500, lineHeight: 1.6 }}>
                         {postcardData.recipientName}
                       </p>
-                      <p style={{ fontSize: '11px', color: '#5c5650', lineHeight: 1.8 }}>
+                      <p style={{ fontSize: '11px', color: '#5c5650', lineHeight: 1.6 }}>
                         {postcardData.recipientAddress || '123 Main Street, Ashburn VA 20148'}
                       </p>
                     </div>
 
-                    {/* QR Code — prominent */}
-                    <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+                    {/* QR Code — centered and prominent */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                       {qrDataUrl && (
                         <div style={{
-                          width: '90px', height: '90px', padding: '5px',
-                          border: '1px solid rgba(184,145,58,0.2)',
+                          width: '130px', height: '130px', padding: '6px',
+                          border: '1px solid rgba(184,145,58,0.25)',
                           background: 'white', flexShrink: 0,
                         }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
                         </div>
                       )}
-                      <div>
+                      <div style={{ marginTop: '8px', textAlign: 'center' }}>
                         <div style={{
-                          background: '#0a0a0a', padding: '5px 10px', marginBottom: '5px',
+                          background: '#0a0a0a', padding: '5px 12px', marginBottom: '4px',
                           display: 'inline-block',
                         }}>
-                          <p style={{ fontSize: '7px', color: '#d4a853', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>
+                          <p style={{ fontSize: '7.5px', color: '#d4a853', letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600 }}>
                             {postcardData.ctaText}
                           </p>
                         </div>
