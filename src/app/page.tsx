@@ -90,45 +90,69 @@ export default function Dashboard() {
   }, []);
 
   // Load saved leads from API, fall back to sample data
+  // Then load cached verifications from Redis and apply re-scoring
   useEffect(() => {
     async function loadLeads() {
+      let processed: Lead[] = [];
+
       // Try API first
       try {
         const res = await fetch('/api/leads');
         const saved = await res.json();
         if (saved && Array.isArray(saved) && saved.length > 0) {
-          const processed = (saved as RawLead[]).map(processLead);
-          setLeads(processed);
-          const cache: Record<string, OutreachStatus> = {};
-          processed.forEach((lead) => {
-            cache[lead.address] = getOutreach(lead.address);
-          });
-          setOutreachCache(cache);
-          return;
+          processed = (saved as RawLead[]).map(processLead);
         }
       } catch {
         // API not available
       }
+
       // Try localStorage
-      const local = loadRawLeads();
-      if (local) {
-        const processed = local.map(processLead);
-        setLeads(processed);
-        const cache: Record<string, OutreachStatus> = {};
-        processed.forEach((lead) => {
-          cache[lead.address] = getOutreach(lead.address);
-        });
-        setOutreachCache(cache);
-        return;
+      if (processed.length === 0) {
+        const local = loadRawLeads();
+        if (local) {
+          processed = local.map(processLead);
+        }
       }
+
       // Fallback to sample data
-      const processed = sampleLeads.map(processLead);
-      setLeads(processed);
+      if (processed.length === 0) {
+        processed = sampleLeads.map(processLead);
+      }
+
+      // Build outreach cache
       const cache: Record<string, OutreachStatus> = {};
       processed.forEach((lead) => {
         cache[lead.address] = getOutreach(lead.address);
       });
       setOutreachCache(cache);
+
+      // Load cached verifications from Redis and apply re-scoring
+      try {
+        const vRes = await fetch('/api/verify-arm');
+        const cachedVerifications: Record<string, PropertyVerification> = await vRes.json();
+
+        if (cachedVerifications && Object.keys(cachedVerifications).length > 0) {
+          // Match cached verifications to leads by normalized address
+          const matchedVerifications: Record<string, PropertyVerification> = {};
+          const normalize = (addr: string) => addr.trim().toLowerCase().replace(/\s+/g, ' ');
+
+          processed = processed.map((lead) => {
+            const normalizedAddr = normalize(lead.address);
+            const cached = cachedVerifications[normalizedAddr];
+            if (cached) {
+              matchedVerifications[lead.address] = cached;
+              return rescoreAfterVerification(lead, cached);
+            }
+            return lead;
+          });
+
+          setVerifications(matchedVerifications);
+        }
+      } catch {
+        // No cached verifications available — that's fine
+      }
+
+      setLeads(processed);
     }
     loadLeads();
   }, []);
