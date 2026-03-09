@@ -115,10 +115,12 @@ export function parseCSV(file: File): Promise<RawLead[]> {
           const headers = results.meta.fields || [];
           const columnMap: Record<string, string> = {};
 
+          const mappedFields = new Set<string>();
           headers.forEach((header) => {
             const mapping = findMapping(header);
-            if (mapping) {
+            if (mapping && !mappedFields.has(mapping)) {
               columnMap[header] = mapping;
+              mappedFields.add(mapping);
             }
           });
 
