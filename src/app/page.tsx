@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import StatsBar from '@/components/StatsBar';
@@ -8,8 +8,8 @@ import UploadZone from '@/components/UploadZone';
 import FilterBar from '@/components/FilterBar';
 import LeadTable from '@/components/LeadTable';
 import SubmissionsPanel from '@/components/SubmissionsPanel';
-import { Lead, RawLead, Filters, SortField, SortDirection, OutreachStatus } from '@/lib/types';
-import { processLead } from '@/lib/scoring';
+import { Lead, RawLead, Filters, SortField, SortDirection, OutreachStatus, PropertyVerification } from '@/lib/types';
+import { processLead, rescoreAfterVerification } from '@/lib/scoring';
 import { parseCSV } from '@/lib/csvParser';
 import { sampleLeads } from '@/lib/sampleData';
 import { getOutreach, saveOutreach, getOutreachLevel, saveRawLeads, loadRawLeads, clearRawLeads } from '@/lib/persistence';
@@ -33,6 +33,61 @@ export default function Dashboard() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [isProcessing, setIsProcessing] = useState(false);
   const [outreachCache, setOutreachCache] = useState<Record<string, OutreachStatus>>({});
+  const [verifications, setVerifications] = useState<Record<string, PropertyVerification>>({});
+  const [bulkVerifyProgress, setBulkVerifyProgress] = useState<{ current: number; total: number } | null>(null);
+  const bulkVerifyCancelRef = useRef(false);
+
+  // Handle single verification result — store + rescore
+  const handleVerification = useCallback((address: string, verification: PropertyVerification) => {
+    setVerifications((prev) => ({ ...prev, [address]: verification }));
+    // Rescore the lead based on actual mortgage type
+    setLeads((prev) =>
+      prev.map((lead) =>
+        lead.address === address ? rescoreAfterVerification(lead, verification) : lead
+      )
+    );
+  }, []);
+
+  // Bulk verify all unverified leads with rate limiting
+  const handleBulkVerify = useCallback(async () => {
+    const unverified = leads.filter((l) => !verifications[l.address]);
+    if (unverified.length === 0) return;
+
+    bulkVerifyCancelRef.current = false;
+    setBulkVerifyProgress({ current: 0, total: unverified.length });
+
+    for (let i = 0; i < unverified.length; i++) {
+      if (bulkVerifyCancelRef.current) break;
+
+      const lead = unverified[i];
+      try {
+        const res = await fetch('/api/verify-arm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: lead.address }),
+        });
+        if (res.ok) {
+          const data: PropertyVerification = await res.json();
+          handleVerification(lead.address, data);
+        }
+      } catch {
+        // Skip failed lookups, continue with next
+      }
+
+      setBulkVerifyProgress({ current: i + 1, total: unverified.length });
+
+      // Rate limit: 150ms delay = ~6.7 req/sec (well under 10/sec limit)
+      if (i < unverified.length - 1 && !bulkVerifyCancelRef.current) {
+        await new Promise((r) => setTimeout(r, 150));
+      }
+    }
+
+    setBulkVerifyProgress(null);
+  }, [leads, verifications, handleVerification]);
+
+  const handleCancelBulkVerify = useCallback(() => {
+    bulkVerifyCancelRef.current = true;
+  }, []);
 
   // Load saved leads from API, fall back to sample data
   useEffect(() => {
@@ -328,6 +383,11 @@ export default function Dashboard() {
           onPriorityToggle={handlePriorityToggle}
           onDeleteLead={handleDeleteLead}
           onDeleteAll={handleDeleteAllLeads}
+          verifications={verifications}
+          onVerification={handleVerification}
+          bulkVerifyProgress={bulkVerifyProgress}
+          onBulkVerify={handleBulkVerify}
+          onCancelBulkVerify={handleCancelBulkVerify}
         />
       </main>
 

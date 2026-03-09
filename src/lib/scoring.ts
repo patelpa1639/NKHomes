@@ -1,4 +1,4 @@
-import { RawLead, Lead, ScoreBreakdown } from './types';
+import { RawLead, Lead, ScoreBreakdown, PropertyVerification } from './types';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const APPRECIATION_RATE = 0.06;
@@ -70,5 +70,32 @@ export function processLead(raw: RawLead): Lead {
     score_tier: scoreTier,
     score_breakdown: scoreBreakdown,
     is_target_neighborhood: isTarget,
+  };
+}
+
+export function rescoreAfterVerification(lead: Lead, verification: PropertyVerification): Lead {
+  // If the mortgage is actually ARM, keep existing score — our assumption was right
+  if (verification.adjustableRate) {
+    return lead;
+  }
+
+  // Fixed Rate: zero out ARM reset points since there's no ARM reset coming
+  const newBreakdown: ScoreBreakdown = {
+    equity_points: lead.score_breakdown.equity_points,
+    arm_reset_points: 0,
+    neighborhood_points: lead.score_breakdown.neighborhood_points,
+    total: Math.min(100, lead.score_breakdown.equity_points + lead.score_breakdown.neighborhood_points),
+  };
+
+  const newScore = newBreakdown.total;
+  let newTier: 'high' | 'warm' | 'monitor' = 'monitor';
+  if (newScore >= 80) newTier = 'high';
+  else if (newScore >= 50) newTier = 'warm';
+
+  return {
+    ...lead,
+    score: newScore,
+    score_tier: newTier,
+    score_breakdown: newBreakdown,
   };
 }

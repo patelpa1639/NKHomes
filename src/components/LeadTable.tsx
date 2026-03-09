@@ -14,6 +14,11 @@ interface LeadTableProps {
   onPriorityToggle: (address: string) => void;
   onDeleteLead: (address: string) => void;
   onDeleteAll: () => void;
+  verifications: Record<string, PropertyVerification>;
+  onVerification: (address: string, verification: PropertyVerification) => void;
+  bulkVerifyProgress: { current: number; total: number } | null;
+  onBulkVerify: () => void;
+  onCancelBulkVerify: () => void;
 }
 
 function formatCurrency(value: number): string {
@@ -447,10 +452,14 @@ export default function LeadTable({
   onPriorityToggle,
   onDeleteLead,
   onDeleteAll,
+  verifications,
+  onVerification,
+  bulkVerifyProgress,
+  onBulkVerify,
+  onCancelBulkVerify,
 }: LeadTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [verifications, setVerifications] = useState<Record<string, PropertyVerification>>({});
   const [verifyLoading, setVerifyLoading] = useState<string | null>(null);
 
   const handleVerifyARM = useCallback(async (address: string) => {
@@ -463,7 +472,7 @@ export default function LeadTable({
       });
       if (res.ok) {
         const data: PropertyVerification = await res.json();
-        setVerifications((prev) => ({ ...prev, [address]: data }));
+        onVerification(address, data);
       } else {
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
         alert(`Could not verify: ${err.error || 'Unknown error'}`);
@@ -473,7 +482,7 @@ export default function LeadTable({
     } finally {
       setVerifyLoading(null);
     }
-  }, []);
+  }, [onVerification]);
 
   const maxEquity = Math.max(...leads.map((l) => l.equity), 1);
   const totalPages = Math.max(1, Math.ceil(leads.length / LEADS_PER_PAGE));
@@ -534,21 +543,59 @@ export default function LeadTable({
 
   return (
     <div className="relative z-10 max-w-[1440px] mx-auto px-8">
-      {/* Table count + Clear All */}
+      {/* Table count + Actions */}
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] text-text-muted font-body font-medium">
-          {leads.length} lead{leads.length !== 1 ? 's' : ''}
-        </p>
-        <button
-          onClick={() => {
-            if (confirm('Remove all leads from the table? Outreach data is preserved.')) {
-              onDeleteAll();
-            }
-          }}
-          className="text-[10px] text-text-muted/50 font-body hover:text-alert transition-colors tracking-wider uppercase"
-        >
-          Clear All
-        </button>
+        <div className="flex items-center gap-4">
+          <p className="text-[11px] text-text-muted font-body font-medium">
+            {leads.length} lead{leads.length !== 1 ? 's' : ''}
+          </p>
+          {Object.keys(verifications).length > 0 && (
+            <p className="text-[10px] text-success/70 font-body font-medium">
+              {Object.keys(verifications).length} verified
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Bulk Verify Button */}
+          {bulkVerifyProgress ? (
+            <div className="flex items-center gap-2">
+              <div className="w-32 h-1.5 bg-black/[0.06] overflow-hidden">
+                <div
+                  className="h-full bg-gold/70 transition-all duration-300"
+                  style={{ width: `${(bulkVerifyProgress.current / bulkVerifyProgress.total) * 100}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-gold font-body font-medium tabular-nums">
+                {bulkVerifyProgress.current}/{bulkVerifyProgress.total}
+              </span>
+              <button
+                onClick={onCancelBulkVerify}
+                className="text-[10px] text-alert/70 font-body hover:text-alert transition-colors uppercase tracking-wider"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onBulkVerify}
+              disabled={leads.every((l) => !!verifications[l.address])}
+              className="text-[10px] text-gold/70 font-body font-medium hover:text-gold transition-colors tracking-wider uppercase disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Verify All
+            </button>
+          )}
+          <span className="text-border-custom">|</span>
+          <button
+            onClick={() => {
+              if (confirm('Remove all leads from the table? Outreach data is preserved.')) {
+                onDeleteAll();
+              }
+            }}
+            className="text-[10px] text-text-muted/50 font-body hover:text-alert transition-colors tracking-wider uppercase"
+          >
+            Clear All
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto border border-border-custom bg-bg-card/30">
