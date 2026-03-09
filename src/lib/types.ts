@@ -46,6 +46,36 @@ export interface LeadPersistence {
 
 export type OutreachLevel = 'untouched' | 'in_progress' | 'complete';
 
+export interface MortgageInfo {
+  amount: number;
+  interestRate: number | null;
+  interestRateType: string; // "Fixed Rate" | "Adjustable Rate" etc.
+  lenderName: string;
+  lenderType: string;
+  loanType: string; // e.g. "Stand Alone Refi (Refinance Of Original Loan)"
+  loanTypeCode: string;
+  term: string; // months, e.g. "360"
+  maturityDate: string | null;
+  documentDate: string | null;
+  position: string; // "First", "Second"
+}
+
+export interface PropertyVerification {
+  adjustableRate: boolean;
+  estimatedValue: number;
+  estimatedEquity: number;
+  equityPercent: number;
+  estimatedMortgageBalance: number;
+  openMortgageBalance: number;
+  currentMortgages: MortgageInfo[];
+  ownerName: string | null;
+  yearBuilt: number | null;
+  propertyUse: string | null;
+  lastSaleDate: string | null;
+  lastSalePrice: number | null;
+  fetchedAt: string; // ISO timestamp
+}
+
 export type SortField =
   | 'score'
   | 'address'

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Lead, SortField, SortDirection, OutreachStatus } from '@/lib/types';
+import { Lead, SortField, SortDirection, OutreachStatus, PropertyVerification } from '@/lib/types';
 
 interface LeadTableProps {
   leads: Lead[];
@@ -95,9 +95,109 @@ function OutreachDots({
   );
 }
 
+function VerifiedMortgageCard({ verification }: { verification: PropertyVerification }) {
+  const mortgage = verification.currentMortgages[0];
+  const isARM = verification.adjustableRate;
+
+  return (
+    <div className="mt-4 border border-border-custom bg-bg-primary/30 p-4 space-y-3">
+      <div className="flex items-center gap-2 mb-2">
+        <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-body font-bold border ${
+          isARM
+            ? 'bg-alert/[0.12] text-alert border-alert/25'
+            : 'bg-success/[0.12] text-success border-success/25'
+        }`}>
+          {isARM ? 'ADJUSTABLE RATE' : 'FIXED RATE'}
+        </span>
+        <span className="text-[9px] text-text-muted/50 font-body">
+          Verified via public records
+        </span>
+      </div>
+
+      {mortgage && (
+        <div className="space-y-2 text-[12px] font-body">
+          <div className="flex justify-between items-baseline">
+            <span className="text-text-muted">Lender</span>
+            <span className="text-text-secondary font-medium text-right max-w-[60%] truncate" title={mortgage.lenderName}>
+              {mortgage.lenderName}
+            </span>
+          </div>
+          {mortgage.interestRate !== null && (
+            <div className="flex justify-between items-baseline">
+              <span className="text-text-muted">Interest Rate</span>
+              <span className="text-text-secondary font-medium">{mortgage.interestRate}%</span>
+            </div>
+          )}
+          <div className="flex justify-between items-baseline">
+            <span className="text-text-muted">Loan Amount</span>
+            <span className="text-text-secondary font-medium">{formatCurrency(mortgage.amount)}</span>
+          </div>
+          {mortgage.term && (
+            <div className="flex justify-between items-baseline">
+              <span className="text-text-muted">Term</span>
+              <span className="text-text-secondary font-medium">
+                {Math.round(Number(mortgage.term) / 12)} years ({mortgage.term} mo)
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between items-baseline">
+            <span className="text-text-muted">Loan Type</span>
+            <span className="text-text-secondary font-medium text-right max-w-[60%] text-[11px]" title={mortgage.loanType}>
+              {mortgage.loanType}
+            </span>
+          </div>
+          {mortgage.maturityDate && (
+            <div className="flex justify-between items-baseline">
+              <span className="text-text-muted">Maturity</span>
+              <span className="text-text-secondary font-medium">
+                {new Date(mortgage.maturityDate).getFullYear()}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* API estimated values */}
+      <div className="pt-3 border-t border-border-custom space-y-2">
+        <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase">
+          Public Record Values
+        </p>
+        <div className="flex justify-between items-baseline text-[12px] font-body">
+          <span className="text-text-muted">Est. Value (API)</span>
+          <span className="text-text-secondary font-medium">{formatCurrency(verification.estimatedValue)}</span>
+        </div>
+        <div className="flex justify-between items-baseline text-[12px] font-body">
+          <span className="text-text-muted">Mortgage Balance</span>
+          <span className="text-text-secondary font-medium">{formatCurrency(verification.estimatedMortgageBalance)}</span>
+        </div>
+        <div className="flex justify-between items-baseline text-[12px] font-body">
+          <span className="text-text-muted">Equity (API)</span>
+          <span className="text-success font-bold">{formatCurrency(verification.estimatedEquity)} ({verification.equityPercent}%)</span>
+        </div>
+      </div>
+
+      {verification.ownerName && (
+        <div className="pt-2 border-t border-border-custom">
+          <div className="flex justify-between items-baseline text-[12px] font-body">
+            <span className="text-text-muted">Owner</span>
+            <span className="text-text-secondary font-medium">{verification.ownerName}</span>
+          </div>
+        </div>
+      )}
+
+      <p className="text-[9px] text-text-muted/40 font-body pt-1">
+        Data from county records via RealEstateAPI &middot; Fetched {new Date(verification.fetchedAt).toLocaleDateString()}
+      </p>
+    </div>
+  );
+}
+
 function ExpandedRow({
   lead,
   outreach,
+  verification,
+  verifyLoading,
+  onVerifyARM,
   onNotesChange,
   onPriorityToggle,
   onOutreachToggle,
@@ -105,6 +205,9 @@ function ExpandedRow({
 }: {
   lead: Lead;
   outreach: OutreachStatus;
+  verification: PropertyVerification | null;
+  verifyLoading: boolean;
+  onVerifyARM: (address: string) => void;
   onNotesChange: (address: string, notes: string) => void;
   onPriorityToggle: (address: string) => void;
   onOutreachToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
@@ -225,6 +328,36 @@ function ExpandedRow({
                   </div>
                 </div>
               </div>
+
+              {/* Verify ARM Section */}
+              {verification ? (
+                <VerifiedMortgageCard verification={verification} />
+              ) : (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onVerifyARM(lead.address);
+                  }}
+                  disabled={verifyLoading}
+                  className={`
+                    mt-4 w-full px-4 py-3 text-[11px] font-body font-semibold tracking-[0.05em] uppercase
+                    border border-gold/25 transition-all duration-200
+                    ${verifyLoading
+                      ? 'bg-gold/[0.05] text-gold/50 cursor-wait'
+                      : 'bg-gold/[0.08] text-gold hover:bg-gold/[0.15] hover:border-gold/40 cursor-pointer'
+                    }
+                  `}
+                >
+                  {verifyLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="inline-block w-3 h-3 border border-gold/40 border-t-gold animate-spin" />
+                      Verifying...
+                    </span>
+                  ) : (
+                    'Verify Mortgage via Public Records'
+                  )}
+                </button>
+              )}
             </div>
 
             {/* Column 3: Outreach & Notes */}
@@ -317,6 +450,30 @@ export default function LeadTable({
 }: LeadTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [verifications, setVerifications] = useState<Record<string, PropertyVerification>>({});
+  const [verifyLoading, setVerifyLoading] = useState<string | null>(null);
+
+  const handleVerifyARM = useCallback(async (address: string) => {
+    setVerifyLoading(address);
+    try {
+      const res = await fetch('/api/verify-arm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address }),
+      });
+      if (res.ok) {
+        const data: PropertyVerification = await res.json();
+        setVerifications((prev) => ({ ...prev, [address]: data }));
+      } else {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        alert(`Could not verify: ${err.error || 'Unknown error'}`);
+      }
+    } catch {
+      alert('Network error verifying property');
+    } finally {
+      setVerifyLoading(null);
+    }
+  }, []);
 
   const maxEquity = Math.max(...leads.map((l) => l.equity), 1);
   const totalPages = Math.max(1, Math.ceil(leads.length / LEADS_PER_PAGE));
@@ -431,7 +588,10 @@ export default function LeadTable({
                   isExpanded={isExpanded}
                   isEven={index % 2 === 0}
                   maxEquity={maxEquity}
+                  verification={verifications[lead.address] || null}
+                  verifyLoading={verifyLoading === lead.address}
                   onToggleRow={toggleRow}
+                  onVerifyARM={handleVerifyARM}
                   onOutreachToggle={onOutreachToggle}
                   onNotesChange={onNotesChange}
                   onPriorityToggle={onPriorityToggle}
@@ -516,7 +676,10 @@ function LeadRow({
   isExpanded,
   isEven,
   maxEquity,
+  verification,
+  verifyLoading,
   onToggleRow,
+  onVerifyARM,
   onOutreachToggle,
   onNotesChange,
   onPriorityToggle,
@@ -527,7 +690,10 @@ function LeadRow({
   isExpanded: boolean;
   isEven: boolean;
   maxEquity: number;
+  verification: PropertyVerification | null;
+  verifyLoading: boolean;
   onToggleRow: (address: string) => void;
+  onVerifyARM: (address: string) => void;
   onOutreachToggle: (address: string, field: 'postcard' | 'email' | 'text') => void;
   onNotesChange: (address: string, notes: string) => void;
   onPriorityToggle: (address: string) => void;
@@ -556,9 +722,21 @@ function LeadRow({
         <td className="px-4 py-3 text-text-secondary tabular-nums">{formatCurrency(lead.sale_price)}</td>
         <td className="px-4 py-3 text-text-muted tabular-nums">{lead.sale_year}</td>
         <td className="px-4 py-3">
-          <span className="text-text-muted/60">5/1</span>
-          <span className="text-border-strong mx-0.5">&middot;</span>
-          <span className="text-text-muted/60">7/1</span>
+          {verification ? (
+            <span className={`text-[10px] font-body font-bold px-1.5 py-0.5 border ${
+              verification.adjustableRate
+                ? 'bg-alert/[0.12] text-alert border-alert/25'
+                : 'bg-success/[0.12] text-success border-success/25'
+            }`}>
+              {verification.adjustableRate ? 'ARM' : 'Fixed'}
+            </span>
+          ) : (
+            <>
+              <span className="text-text-muted/60">5/1</span>
+              <span className="text-border-strong mx-0.5">&middot;</span>
+              <span className="text-text-muted/60">7/1</span>
+            </>
+          )}
         </td>
         <td className="px-4 py-3">
           <span className={`tabular-nums ${lead.arm5_reset_year <= currentYear ? 'text-alert font-semibold' : lead.arm5_reset_year === currentYear + 1 ? 'text-warning' : 'text-text-muted'}`}>
@@ -590,6 +768,9 @@ function LeadRow({
         <ExpandedRow
           lead={lead}
           outreach={outreach}
+          verification={verification}
+          verifyLoading={verifyLoading}
+          onVerifyARM={onVerifyARM}
           onNotesChange={onNotesChange}
           onPriorityToggle={onPriorityToggle}
           onOutreachToggle={onOutreachToggle}
