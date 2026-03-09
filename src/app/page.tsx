@@ -12,7 +12,7 @@ import { Lead, RawLead, Filters, SortField, SortDirection, OutreachStatus } from
 import { processLead } from '@/lib/scoring';
 import { parseCSV } from '@/lib/csvParser';
 import { sampleLeads } from '@/lib/sampleData';
-import { getOutreach, saveOutreach, getOutreachLevel } from '@/lib/persistence';
+import { getOutreach, saveOutreach, getOutreachLevel, saveRawLeads, loadRawLeads, clearRawLeads } from '@/lib/persistence';
 import { exportLeadsToCSV } from '@/lib/exportCsv';
 import PinGate from '@/components/PinGate';
 import GreetingCard from '@/components/GreetingCard';
@@ -37,6 +37,7 @@ export default function Dashboard() {
   // Load saved leads from API, fall back to sample data
   useEffect(() => {
     async function loadLeads() {
+      // Try API first
       try {
         const res = await fetch('/api/leads');
         const saved = await res.json();
@@ -51,7 +52,19 @@ export default function Dashboard() {
           return;
         }
       } catch {
-        // API not available, use sample data
+        // API not available
+      }
+      // Try localStorage
+      const local = loadRawLeads();
+      if (local) {
+        const processed = local.map(processLead);
+        setLeads(processed);
+        const cache: Record<string, OutreachStatus> = {};
+        processed.forEach((lead) => {
+          cache[lead.address] = getOutreach(lead.address);
+        });
+        setOutreachCache(cache);
+        return;
       }
       // Fallback to sample data
       const processed = sampleLeads.map(processLead);
@@ -79,7 +92,10 @@ export default function Dashboard() {
       });
       setOutreachCache(cache);
 
-      // Save raw leads to API so they persist across refreshes
+      // Save to localStorage so other pages (postcard) can access
+      saveRawLeads(rawLeads);
+
+      // Also try API for server persistence
       fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,6 +168,7 @@ export default function Dashboard() {
   const handleDeleteAllLeads = useCallback(() => {
     setLeads([]);
     setOutreachCache({});
+    clearRawLeads();
     // Clear saved leads from server so sample data loads on next visit
     fetch('/api/leads', { method: 'DELETE' }).catch(() => {});
   }, []);

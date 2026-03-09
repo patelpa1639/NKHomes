@@ -1,6 +1,7 @@
-import { OutreachStatus, LeadPersistence } from './types';
+import { OutreachStatus, LeadPersistence, RawLead } from './types';
 
 const STORAGE_KEY = 'nkhomes_lead_data';
+const LEADS_STORAGE_KEY = 'nkhomes_raw_leads';
 
 const DEFAULT_OUTREACH: OutreachStatus = {
   postcard: false,
@@ -30,6 +31,32 @@ export function saveOutreach(address: string, status: Partial<OutreachStatus>): 
   const all = loadAllOutreach();
   all[address] = { ...getOutreach(address), ...status };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
+export function saveRawLeads(leads: RawLead[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(leads));
+  } catch {
+    // localStorage full or unavailable
+  }
+}
+
+export function loadRawLeads(): RawLead[] | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const data = localStorage.getItem(LEADS_STORAGE_KEY);
+    if (!data) return null;
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearRawLeads(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(LEADS_STORAGE_KEY);
 }
 
 export function getOutreachLevel(status: OutreachStatus): 'untouched' | 'in_progress' | 'complete' {

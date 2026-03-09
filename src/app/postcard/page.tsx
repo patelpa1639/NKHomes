@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Lead } from '@/lib/types';
+import { Lead, RawLead } from '@/lib/types';
 import { processLead } from '@/lib/scoring';
 import { sampleLeads } from '@/lib/sampleData';
+import { loadRawLeads } from '@/lib/persistence';
 import QRCode from 'qrcode';
 import PinGate from '@/components/PinGate';
 
@@ -58,8 +59,31 @@ export default function PostcardPage() {
   const backRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const processed = sampleLeads.map(processLead);
-    setLeads(processed);
+    async function loadLeads() {
+      // Try API first
+      try {
+        const res = await fetch('/api/leads');
+        const saved = await res.json();
+        if (saved && Array.isArray(saved) && saved.length > 0) {
+          const processed = (saved as RawLead[]).map(processLead);
+          setLeads(processed);
+          return;
+        }
+      } catch {
+        // API not available
+      }
+      // Try localStorage (shared from dashboard upload)
+      const local = loadRawLeads();
+      if (local) {
+        const processed = local.map(processLead);
+        setLeads(processed);
+        return;
+      }
+      // Fallback to sample data
+      const processed = sampleLeads.map(processLead);
+      setLeads(processed);
+    }
+    loadLeads();
   }, []);
 
   // Generate QR code with property-specific URL
