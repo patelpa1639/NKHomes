@@ -69,14 +69,39 @@ const COLUMN_MAPPINGS: Record<string, string[]> = {
   ],
 };
 
+// Columns that should never be mapped to any field
+const BLACKLISTED_COLUMNS = [
+  'ratio',
+  'price/sqft',
+  'pricesqft',
+  'price per sqft',
+  'mls',
+  'mls #',
+  'mls number',
+  'dom',
+  'days on market',
+  'cdom',
+  'photo count',
+  'virtual tour',
+];
+
 function normalizeColumnName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
 }
 
+function isBlacklisted(csvColumn: string): boolean {
+  const normalized = normalizeColumnName(csvColumn);
+  const lower = csvColumn.toLowerCase().trim();
+  return BLACKLISTED_COLUMNS.some((b) => normalized.includes(b) || lower.includes(b));
+}
+
 function findMapping(csvColumn: string): string | null {
+  if (isBlacklisted(csvColumn)) return null;
   const normalized = normalizeColumnName(csvColumn);
   for (const [field, variations] of Object.entries(COLUMN_MAPPINGS)) {
-    if (variations.some((v) => normalized.includes(v) || v.includes(normalized))) {
+    // Only match when column name contains the variation (not the reverse)
+    // This prevents "Status" from matching "status contractual search date"
+    if (variations.some((v) => normalized === v || normalized.includes(v))) {
       return field;
     }
   }

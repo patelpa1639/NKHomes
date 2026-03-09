@@ -139,58 +139,88 @@ function ExpandedRow({
 
             {/* Column 2: Score & Equity Breakdown */}
             <div>
-              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
+              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-3">
                 Score Breakdown
               </p>
-              <div className="space-y-3 text-[12px] font-body">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-text-muted">Equity</span>
-                  <span className="text-text-secondary font-medium">+{lead.score_breakdown.equity_points}</span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-text-muted">ARM Reset Timing</span>
-                  <span className="text-text-secondary font-medium">+{lead.score_breakdown.arm_reset_points}</span>
-                </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-text-muted">Neighborhood</span>
-                  <span className="text-text-secondary font-medium">+{lead.score_breakdown.neighborhood_points}</span>
-                </div>
-                <div className="flex justify-between items-baseline pt-3 border-t border-border-custom">
-                  <span className="text-gold font-semibold">Total</span>
-                  <span className="text-gold font-bold text-lg">{lead.score}</span>
-                </div>
+              {/* Compact score chips */}
+              <div className="flex flex-wrap gap-1.5 mb-6">
+                <span className="inline-flex items-center px-2 py-1 text-[10px] font-body font-semibold bg-gold/[0.08] text-gold border border-gold/20">
+                  Equity +{lead.score_breakdown.equity_points}
+                </span>
+                <span className="inline-flex items-center px-2 py-1 text-[10px] font-body font-semibold bg-warning/[0.08] text-warning border border-warning/20">
+                  ARM +{lead.score_breakdown.arm_reset_points}
+                </span>
+                <span className="inline-flex items-center px-2 py-1 text-[10px] font-body font-semibold bg-success/[0.08] text-success border border-success/20">
+                  Area +{lead.score_breakdown.neighborhood_points}
+                </span>
+                <span className="inline-flex items-center px-2 py-1 text-[10px] font-body font-bold bg-gold/[0.15] text-gold border border-gold/30">
+                  = {lead.score}
+                </span>
               </div>
 
-              <div className="mt-8">
-                <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
-                  Value &amp; Equity Estimate
-                </p>
-                <div className="space-y-3 text-[12px] font-body">
+              <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase mb-4">
+                Value Estimate
+              </p>
+              <div className="space-y-3 text-[12px] font-body">
+                {/* Method 1: 6% Annual Appreciation */}
+                <div>
                   <div className="flex justify-between items-baseline">
-                    <span className="text-text-muted">Est. Value <span className="text-[9px]">(6% appr.)</span></span>
+                    <span className="text-text-muted">Method 1: 6% Annual Appreciation</span>
                     <span className="text-text-secondary font-medium">{formatCurrency(lead.estimated_value)}</span>
                   </div>
-                  {lead.tax_assessed_value > 0 && (
+                  <p className="text-[10px] text-text-muted/50 mt-0.5">
+                    {formatCurrency(lead.sale_price)} &times; 1.06<sup>{new Date().getFullYear() - lead.sale_year}</sup>
+                  </p>
+                </div>
+
+                {/* Method 2: County Tax Assessment */}
+                {(() => {
+                  const isLandOnly = lead.tax_assessed_value > 0 && lead.tax_assessed_value < lead.sale_price * 0.5;
+                  return lead.tax_assessed_value > 0 ? (
                     <>
-                      <div className="flex justify-between items-baseline">
-                        <span className="text-text-muted">Tax Assessed Value</span>
-                        <span className="text-text-secondary font-medium">{formatCurrency(lead.tax_assessed_value)}</span>
+                      <div>
+                        <div className="flex justify-between items-baseline">
+                          <span className={`text-text-muted ${isLandOnly ? 'line-through' : ''}`}>
+                            Method 2: County Tax Assessment
+                          </span>
+                          <span className={`font-medium ${isLandOnly ? 'text-text-muted/40 line-through' : 'text-text-secondary'}`}>
+                            {formatCurrency(lead.tax_assessed_value)}
+                          </span>
+                        </div>
+                        {isLandOnly && (
+                          <p className="text-[10px] text-warning mt-1 flex items-center gap-1">
+                            <span>&#9888;</span> Likely land-only assessment (pre-construction)
+                          </p>
+                        )}
                       </div>
-                      <div className="flex justify-between items-baseline">
-                        <span className="text-text-muted/60 text-[10px]">Difference</span>
-                        <span className={`text-[10px] font-medium ${lead.estimated_value >= lead.tax_assessed_value ? 'text-success' : 'text-alert'}`}>
-                          {lead.estimated_value >= lead.tax_assessed_value ? '+' : ''}{formatCurrency(lead.estimated_value - lead.tax_assessed_value)}
-                          {' '}({lead.tax_assessed_value > 0 ? ((lead.estimated_value / lead.tax_assessed_value - 1) * 100).toFixed(1) : '0'}%)
-                        </span>
-                      </div>
+                      {!isLandOnly && (
+                        <div className="flex justify-between items-baseline pl-3">
+                          <span className="text-text-muted/50 text-[10px]">Difference</span>
+                          <span className={`text-[10px] font-medium ${lead.estimated_value >= lead.tax_assessed_value ? 'text-success' : 'text-alert'}`}>
+                            {lead.estimated_value >= lead.tax_assessed_value ? '+' : ''}{formatCurrency(lead.estimated_value - lead.tax_assessed_value)}
+                            {' '}({((lead.estimated_value / lead.tax_assessed_value - 1) * 100).toFixed(1)}%)
+                          </span>
+                        </div>
+                      )}
                     </>
-                  )}
+                  ) : null;
+                })()}
+
+                {/* Equity breakdown with formula */}
+                <div className="pt-3 border-t border-border-custom space-y-2">
+                  <p className="text-[10px] font-body font-semibold text-gold/70 tracking-[0.15em] uppercase">
+                    Equity Breakdown
+                  </p>
                   <div className="flex justify-between items-baseline">
-                    <span className="text-text-muted">Mortgage (80% LTV)</span>
+                    <span className="text-text-muted">Est. Value</span>
+                    <span className="text-text-secondary font-medium">{formatCurrency(lead.estimated_value)}</span>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-text-muted">&minus; Mortgage (80% LTV)</span>
                     <span className="text-text-secondary font-medium">{formatCurrency(lead.mortgage_balance)}</span>
                   </div>
-                  <div className="flex justify-between items-baseline pt-3 border-t border-border-custom">
-                    <span className="text-success font-semibold">Equity</span>
+                  <div className="flex justify-between items-baseline pt-2 border-t border-border-custom">
+                    <span className="text-success font-semibold">= Equity</span>
                     <span className="text-success font-bold text-lg">{formatCurrency(lead.equity)}</span>
                   </div>
                 </div>
@@ -412,6 +442,12 @@ export default function LeadTable({
           </tbody>
         </table>
       </div>
+
+      {/* ARM Assumption Footnote */}
+      <p className="text-[9px] text-text-muted/40 font-body mt-3 px-1">
+        * ARM reset years are estimated assuming 5/1 and 7/1 adjustable-rate mortgages based on sale date. Actual mortgage type is not known &mdash; verify with county records or borrower.
+        Value estimates use 6% annual appreciation from sale price. Mortgage assumes 80% LTV at purchase.
+      </p>
 
       {/* Pagination */}
       {totalPages > 1 && (

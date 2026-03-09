@@ -15,6 +15,10 @@ export default function StatsBar({ leads }: StatsBarProps) {
   const highPriority = leads.filter((l) => l.score >= 80).length;
   const resetsThisYear = leads.filter((l) => l.arm5_reset_year === currentYear).length;
   const resetsNextYear = leads.filter((l) => l.arm5_reset_year === currentYear + 1).length;
+  const avgEstValue =
+    leads.length > 0
+      ? Math.round(leads.reduce((sum, l) => sum + l.estimated_value, 0) / leads.length)
+      : 0;
   const avgEquity =
     leads.length > 0
       ? Math.round(leads.reduce((sum, l) => sum + l.equity, 0) / leads.length)
@@ -46,6 +50,12 @@ export default function StatsBar({ leads }: StatsBarProps) {
       barColor: 'bg-warning/30',
     },
     {
+      label: 'Avg Est. Value',
+      value: `$${avgEstValue.toLocaleString()}`,
+      accentColor: 'text-text-secondary',
+      barColor: 'bg-text-muted/20',
+    },
+    {
       label: 'Avg Equity',
       value: `$${avgEquity.toLocaleString()}`,
       accentColor: 'text-success',
@@ -54,7 +64,7 @@ export default function StatsBar({ leads }: StatsBarProps) {
   ];
 
   return (
-    <div className="relative z-10 grid grid-cols-5 gap-3 max-w-[1440px] mx-auto px-8 py-6">
+    <div className="relative z-10 grid grid-cols-6 gap-3 max-w-[1440px] mx-auto px-8 py-6">
       {stats.map((stat) => (
         <div
           key={stat.label}
