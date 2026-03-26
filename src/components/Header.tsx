@@ -50,6 +50,9 @@ export default function Header() {
             <a href="/sop" className="text-[11px] text-text-muted font-body font-medium hover:text-gold transition-colors tracking-wider uppercase">
               SOP
             </a>
+            <a href="/cma" className="text-[11px] text-text-muted font-body font-medium hover:text-gold transition-colors tracking-wider uppercase">
+              CMA Tool
+            </a>
             <a href="/value" target="_blank" className="text-[11px] text-text-muted font-body font-medium hover:text-gold transition-colors tracking-wider uppercase flex items-center gap-1">
               Landing Page
               <svg width="10" height="10" viewBox="0 0 16 16" fill="none" className="opacity-50">
