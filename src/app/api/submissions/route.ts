@@ -1,6 +1,16 @@
 import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json(null, { headers: corsHeaders });
+}
+
 interface HomeValueSubmission {
   id: string;
   address: string;
@@ -60,10 +70,10 @@ export async function POST(req: Request) {
     existing.unshift(submission);
     await redis.set(STORAGE_KEY, existing);
 
-    return NextResponse.json(submission, { status: 201 });
+    return NextResponse.json(submission, { status: 201, headers: corsHeaders });
   } catch (error) {
     console.error('Failed to save submission:', error);
-    return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to save' }, { status: 500, headers: corsHeaders });
   }
 }
 
