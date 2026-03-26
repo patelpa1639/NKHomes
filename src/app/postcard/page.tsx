@@ -186,11 +186,10 @@ export default function PostcardPage() {
       <div className="bg-bg-elevated/80 backdrop-blur-xl border-b border-border-custom">
         <div className="max-w-[1440px] mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
-              <div className="relative w-9 h-9 border border-gold/50 flex items-center justify-center bg-gold/5">
-                <span className="font-display text-sm font-bold text-gold tracking-wider">NK</span>
-              </div>
-              <span className="font-display text-lg font-semibold text-text-primary tracking-[0.04em]">NK HOMES</span>
+            <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="NK Homes" className="h-9 w-auto" />
+              <span className="text-lg font-light text-text-primary tracking-[0.15em] uppercase" style={{ fontFamily: "var(--font-brand)" }}>Neena K Homes</span>
             </a>
             <span className="text-border-strong mx-2">/</span>
             <span className="text-[11px] text-gold/80 font-body font-medium tracking-[0.1em] uppercase">Postcard Designer</span>
