@@ -367,15 +367,14 @@ export default function PostcardPage() {
                   }}
                 />
 
-                {/* Top-left overlay — covers baked-in headline, shows editable text */}
+                {/* Top-left — editable text positioned over the baked-in text, transparent bg */}
                 <div style={{
                   position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '50%',
-                  height: '55%',
-                  background: 'linear-gradient(160deg, #4f44a0 0%, #5a4eaa 40%, #6356b0 100%)',
-                  padding: '22px 26px',
+                  top: '4%',
+                  left: '3%',
+                  width: '45%',
+                  height: '50%',
+                  padding: '10px 14px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -387,7 +386,7 @@ export default function PostcardPage() {
                     color: 'rgba(255,255,255,0.65)',
                     letterSpacing: '2.5px',
                     textTransform: 'uppercase',
-                    marginBottom: '12px',
+                    marginBottom: '10px',
                   }}>
                     NEENA K HOMES
                   </p>
@@ -397,7 +396,7 @@ export default function PostcardPage() {
                     color: '#ffffff',
                     lineHeight: 1.1,
                     letterSpacing: '-0.3px',
-                    marginBottom: '14px',
+                    marginBottom: '12px',
                   }}>
                     {postcardData.headline}
                   </h2>
@@ -410,49 +409,14 @@ export default function PostcardPage() {
                   </p>
                 </div>
 
-                {/* QR Code overlay — top-right corner over the abstract design */}
-                {qrDataUrl && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    zIndex: 10,
-                    textAlign: 'center',
-                  }}>
-                    <div style={{
-                      width: '100px',
-                      height: '100px',
-                      padding: '4px',
-                      background: 'white',
-                      borderRadius: '6px',
-                      boxShadow: '0 2px 16px rgba(0,0,0,0.35)',
-                    }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
-                    </div>
-                    <p style={{
-                      fontSize: '6.5px',
-                      color: 'rgba(255,255,255,0.8)',
-                      marginTop: '4px',
-                      letterSpacing: '1px',
-                      textTransform: 'uppercase',
-                      fontWeight: 600,
-                      textShadow: '0 1px 4px rgba(0,0,0,0.6)',
-                    }}>
-                      Scan for your report
-                    </p>
-                  </div>
-                )}
-
-                {/* Bottom-left overlay — covers baked-in bullet points */}
+                {/* Bottom-left — editable bullet points positioned over baked-in text */}
                 <div style={{
                   position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  width: '50%',
-                  height: '45%',
-                  background: 'linear-gradient(160deg, #5a4eaa 0%, #4f44a0 100%)',
-                  padding: '16px 26px',
+                  bottom: '3%',
+                  left: '3%',
+                  width: '45%',
+                  height: '40%',
+                  padding: '10px 14px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -492,15 +456,14 @@ export default function PostcardPage() {
                   </div>
                 </div>
 
-                {/* Bottom-right overlay — covers baked-in "Data-Driven" text */}
+                {/* Bottom-right — editable text positioned over the cream area */}
                 <div style={{
                   position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  width: '50%',
-                  height: '45%',
-                  background: '#f0ede5',
-                  padding: '20px 28px',
+                  bottom: '3%',
+                  right: '3%',
+                  width: '45%',
+                  height: '40%',
+                  padding: '14px 20px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
