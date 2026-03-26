@@ -351,53 +351,152 @@ export default function PostcardPage() {
                   aspectRatio: '6/4',
                   position: 'relative',
                   overflow: 'hidden',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gridTemplateRows: '1fr 1fr',
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
-                {/* Background image — 1.png design */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/postcard-front.png"
-                  alt="NK Homes Postcard Front"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
-
-                {/* QR Code overlay — top right corner */}
-                {qrDataUrl && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    zIndex: 10,
+                {/* Top-left quadrant — purple with headline */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #4a3f8a, #5b4fa0)',
+                  padding: '24px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}>
+                  <p style={{
+                    fontSize: '9px',
+                    fontWeight: 600,
+                    color: 'rgba(255,255,255,0.6)',
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase',
+                    marginBottom: '10px',
                   }}>
-                    <div style={{
-                      width: '100px',
-                      height: '100px',
-                      padding: '4px',
-                      background: 'white',
-                      borderRadius: '6px',
-                      boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
-                    }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
+                    NEENA K HOMES
+                  </p>
+                  <h2 style={{
+                    fontSize: '24px',
+                    fontWeight: 800,
+                    color: '#ffffff',
+                    lineHeight: 1.15,
+                    letterSpacing: '-0.3px',
+                  }}>
+                    {postcardData.headline}
+                  </h2>
+                </div>
+
+                {/* Top-right quadrant — darker purple/teal with QR code */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #3d3580, #2a4a6b)',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}>
+                  {/* Abstract pattern overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 0, opacity: 0.08,
+                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.3) 15px, rgba(255,255,255,0.3) 16px)',
+                  }} />
+                  {qrDataUrl && (
+                    <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+                      <div style={{
+                        width: '110px',
+                        height: '110px',
+                        padding: '5px',
+                        background: 'white',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                        margin: '0 auto',
+                      }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
+                      </div>
+                      <p style={{
+                        fontSize: '7px',
+                        color: 'rgba(255,255,255,0.7)',
+                        marginTop: '6px',
+                        letterSpacing: '1px',
+                        textTransform: 'uppercase',
+                        fontWeight: 600,
+                      }}>
+                        Scan for your report
+                      </p>
                     </div>
-                    <p style={{
-                      textAlign: 'center',
-                      fontSize: '6px',
-                      color: '#ffffff',
-                      marginTop: '3px',
-                      letterSpacing: '0.5px',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.8)',
-                      fontWeight: 600,
-                    }}>
-                      SCAN FOR YOUR REPORT
-                    </p>
+                  )}
+                </div>
+
+                {/* Bottom-left quadrant — body text */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #3d3580, #4a3f8a)',
+                  padding: '20px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}>
+                  <p style={{
+                    fontSize: '12px',
+                    color: 'rgba(255,255,255,0.85)',
+                    lineHeight: 1.7,
+                    marginBottom: '12px',
+                  }}>
+                    {postcardData.bodyText}
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    fontSize: '9px',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#a8d8a8' }}>&#10003;</span>
+                      <span>Your true market value (not a guess)</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#a8d8a8' }}>&#10003;</span>
+                      <span>What buyers would actually pay today</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#a8d8a8' }}>&#10003;</span>
+                      <span>Nearby sales most agents don&apos;t show</span>
+                    </div>
                   </div>
-                )}
+                </div>
+
+                {/* Bottom-right quadrant — CTA + branding */}
+                <div style={{
+                  background: '#f5f3ee',
+                  padding: '20px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                }}>
+                  <p style={{
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: '#2c2824',
+                    lineHeight: 1.4,
+                    marginBottom: '10px',
+                  }}>
+                    {postcardData.ctaText}
+                  </p>
+                  <div style={{ width: '40px', height: '1px', background: 'rgba(184,145,58,0.4)', marginBottom: '10px' }} />
+                  <p style={{
+                    fontSize: '9px',
+                    color: '#948d84',
+                    letterSpacing: '1.5px',
+                    textTransform: 'uppercase',
+                    fontWeight: 600,
+                  }}>
+                    Data-Driven Home Valuations
+                  </p>
+                </div>
               </div>
             </div>
 
