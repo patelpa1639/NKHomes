@@ -351,99 +351,120 @@ export default function PostcardPage() {
                   aspectRatio: '6/4',
                   position: 'relative',
                   overflow: 'hidden',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gridTemplateRows: '1fr 1fr',
                   fontFamily: "'Inter', sans-serif",
                 }}
               >
-                {/* Top-left quadrant — purple with headline */}
+                {/* Actual 1.png as background */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/postcard-front.png"
+                  alt="NK Homes Postcard Front"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+
+                {/* Top-left overlay — covers baked-in headline, shows editable text */}
                 <div style={{
-                  background: 'linear-gradient(135deg, #4a3f8a, #5b4fa0)',
-                  padding: '24px 28px',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '50%',
+                  height: '55%',
+                  background: 'linear-gradient(160deg, #4f44a0 0%, #5a4eaa 40%, #6356b0 100%)',
+                  padding: '22px 26px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
-                  position: 'relative',
+                  zIndex: 2,
                 }}>
                   <p style={{
                     fontSize: '9px',
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.6)',
-                    letterSpacing: '2px',
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.65)',
+                    letterSpacing: '2.5px',
                     textTransform: 'uppercase',
-                    marginBottom: '10px',
+                    marginBottom: '12px',
                   }}>
                     NEENA K HOMES
                   </p>
                   <h2 style={{
-                    fontSize: '24px',
-                    fontWeight: 800,
+                    fontSize: '26px',
+                    fontWeight: 900,
                     color: '#ffffff',
-                    lineHeight: 1.15,
+                    lineHeight: 1.1,
                     letterSpacing: '-0.3px',
+                    marginBottom: '14px',
                   }}>
                     {postcardData.headline}
                   </h2>
+                  <p style={{
+                    fontSize: '11px',
+                    color: 'rgba(255,255,255,0.75)',
+                    lineHeight: 1.6,
+                  }}>
+                    {postcardData.bodyText}
+                  </p>
                 </div>
 
-                {/* Top-right quadrant — darker purple/teal with QR code */}
-                <div style={{
-                  background: 'linear-gradient(135deg, #3d3580, #2a4a6b)',
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                }}>
-                  {/* Abstract pattern overlay */}
+                {/* QR Code overlay — top-right corner over the abstract design */}
+                {qrDataUrl && (
                   <div style={{
-                    position: 'absolute', inset: 0, opacity: 0.08,
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.3) 15px, rgba(255,255,255,0.3) 16px)',
-                  }} />
-                  {qrDataUrl && (
-                    <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
-                      <div style={{
-                        width: '110px',
-                        height: '110px',
-                        padding: '5px',
-                        background: 'white',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                        margin: '0 auto',
-                      }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
-                      </div>
-                      <p style={{
-                        fontSize: '7px',
-                        color: 'rgba(255,255,255,0.7)',
-                        marginTop: '6px',
-                        letterSpacing: '1px',
-                        textTransform: 'uppercase',
-                        fontWeight: 600,
-                      }}>
-                        Scan for your report
-                      </p>
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    zIndex: 10,
+                    textAlign: 'center',
+                  }}>
+                    <div style={{
+                      width: '100px',
+                      height: '100px',
+                      padding: '4px',
+                      background: 'white',
+                      borderRadius: '6px',
+                      boxShadow: '0 2px 16px rgba(0,0,0,0.35)',
+                    }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={qrDataUrl} alt="QR Code" style={{ width: '100%', height: '100%' }} />
                     </div>
-                  )}
-                </div>
+                    <p style={{
+                      fontSize: '6.5px',
+                      color: 'rgba(255,255,255,0.8)',
+                      marginTop: '4px',
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+                    }}>
+                      Scan for your report
+                    </p>
+                  </div>
+                )}
 
-                {/* Bottom-left quadrant — body text */}
+                {/* Bottom-left overlay — covers baked-in bullet points */}
                 <div style={{
-                  background: 'linear-gradient(135deg, #3d3580, #4a3f8a)',
-                  padding: '20px 28px',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  width: '50%',
+                  height: '45%',
+                  background: 'linear-gradient(160deg, #5a4eaa 0%, #4f44a0 100%)',
+                  padding: '16px 26px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
+                  zIndex: 2,
                 }}>
                   <p style={{
-                    fontSize: '12px',
-                    color: 'rgba(255,255,255,0.85)',
-                    lineHeight: 1.7,
-                    marginBottom: '12px',
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.8)',
+                    fontWeight: 600,
+                    marginBottom: '8px',
                   }}>
-                    {postcardData.bodyText}
+                    {postcardData.ctaText}
                   </p>
                   <div style={{
                     display: 'flex',
@@ -464,35 +485,34 @@ export default function PostcardPage() {
                       <span style={{ color: '#a8d8a8' }}>&#10003;</span>
                       <span>Nearby sales most agents don&apos;t show</span>
                     </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: '#a8d8a8' }}>&#10003;</span>
+                      <span>Hidden opportunities (even if you&apos;re not selling)</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Bottom-right quadrant — CTA + branding */}
+                {/* Bottom-right overlay — covers baked-in "Data-Driven" text */}
                 <div style={{
-                  background: '#f5f3ee',
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  width: '50%',
+                  height: '45%',
+                  background: '#f0ede5',
                   padding: '20px 28px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
                   textAlign: 'center',
+                  zIndex: 2,
                 }}>
                   <p style={{
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: 700,
                     color: '#2c2824',
-                    lineHeight: 1.4,
-                    marginBottom: '10px',
-                  }}>
-                    {postcardData.ctaText}
-                  </p>
-                  <div style={{ width: '40px', height: '1px', background: 'rgba(184,145,58,0.4)', marginBottom: '10px' }} />
-                  <p style={{
-                    fontSize: '9px',
-                    color: '#948d84',
-                    letterSpacing: '1.5px',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
+                    lineHeight: 1.35,
                   }}>
                     Data-Driven Home Valuations
                   </p>
